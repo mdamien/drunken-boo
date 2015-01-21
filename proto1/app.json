@@ -1,0 +1,275 @@
+{
+	"camera": {
+		"metadata": {
+			"version": 4.3,
+			"type": "Object",
+			"generator": "ObjectExporter"
+		},
+		"object": {
+			"uuid": "F53E771B-6177-42E3-8A52-071A91550DD8",
+			"type": "PerspectiveCamera",
+			"name": "Camera",
+			"fov": 50,
+			"aspect": 2.8373493975903616,
+			"near": 0.1,
+			"far": 100000,
+			"matrix": [0.48224177956581116,6.320858148001207e-8,-0.8760381937026978,0,-0.17852136492729187,0.9790161848068237,-0.0982724279165268,0,0.8576555252075195,0.2037826031446457,0.4721224904060364,0,2032.8568115234375,1199.2403564453125,2323.4521484375,1]
+		}
+	},
+	"scene": {
+		"metadata": {
+			"version": 4.3,
+			"type": "Object",
+			"generator": "ObjectExporter"
+		},
+		"geometries": [
+			{
+				"uuid": "6857405D-D544-4F32-B892-981CF816C4D6",
+				"type": "SphereGeometry",
+				"radius": 75,
+				"widthSegments": 32,
+				"heightSegments": 16,
+				"phiStart": 0,
+				"phiLength": 6.283185307179586,
+				"thetaStart": 0,
+				"thetaLength": 3.141592653589793
+			},
+			{
+				"uuid": "FEC87C68-8BAB-411C-BDA4-ECAEE32FC387",
+				"type": "BoxGeometry",
+				"width": 100,
+				"height": 100,
+				"depth": 100,
+				"widthSegments": 1,
+				"heightSegments": 1,
+				"depthSegments": 1
+			},
+			{
+				"uuid": "19CBCC48-9D9C-491E-83EB-85DAF6451D50",
+				"type": "SphereGeometry",
+				"radius": 75,
+				"widthSegments": 32,
+				"heightSegments": 16,
+				"phiStart": 0,
+				"phiLength": 6.283185307179586,
+				"thetaStart": 0,
+				"thetaLength": 3.141592653589793
+			},
+			{
+				"uuid": "1601F7CB-A2F3-40CF-9D65-8267EEFC1ABB",
+				"type": "PlaneGeometry",
+				"width": 200,
+				"height": 200,
+				"widthSegments": 1,
+				"heightSegments": 1
+			},
+			{
+				"uuid": "271650BD-5A36-4BB0-8235-7B37FA771C67",
+				"type": "SphereGeometry",
+				"radius": 75,
+				"widthSegments": 32,
+				"heightSegments": 16,
+				"phiStart": 0,
+				"phiLength": 6.283185307179586,
+				"thetaStart": 0,
+				"thetaLength": 3.141592653589793
+			},
+			{
+				"uuid": "4E7EEC6A-2368-4496-B7FD-F6DF75772F04",
+				"type": "TorusGeometry",
+				"radius": 100,
+				"tube": 40,
+				"radialSegments": 8,
+				"tubularSegments": 6,
+				"arc": 6.283185307179586
+			},
+			{
+				"uuid": "FF274308-E1D9-4FC5-A10A-5B1852465892",
+				"type": "BoxGeometry",
+				"width": 100,
+				"height": 100,
+				"depth": 100,
+				"widthSegments": 1,
+				"heightSegments": 1,
+				"depthSegments": 1
+			}],
+		"materials": [
+			{
+				"uuid": "6C920858-323D-4C45-BC26-C1271065E8F0",
+				"type": "MeshPhongMaterial",
+				"color": 16732503,
+				"ambient": 16777215,
+				"emissive": 0,
+				"specular": 0,
+				"shininess": 17.06
+			},
+			{
+				"uuid": "716EB8D8-2855-40D7-9584-DCE7323E3CF7",
+				"type": "MeshPhongMaterial",
+				"color": 3604476,
+				"ambient": 16777215,
+				"emissive": 0,
+				"specular": 1118481,
+				"shininess": 0
+			},
+			{
+				"uuid": "D5ED5CA9-B036-4574-BD1C-C78581D39297",
+				"type": "MeshPhongMaterial",
+				"color": 5087999,
+				"ambient": 16777215,
+				"emissive": 0,
+				"specular": 1118481,
+				"shininess": 0
+			},
+			{
+				"uuid": "3B4CD083-1B6B-4CA7-A353-D77E031C7390",
+				"type": "MeshPhongMaterial",
+				"color": 13327871,
+				"ambient": 16777215,
+				"emissive": 0,
+				"specular": 1118481,
+				"shininess": 14.62
+			},
+			{
+				"uuid": "ABC07BFE-8A0D-4381-BAD1-2E3E29D874F6",
+				"type": "MeshPhongMaterial",
+				"color": 11993248,
+				"ambient": 16777215,
+				"emissive": 0,
+				"specular": 1118481,
+				"shininess": 0.7
+			},
+			{
+				"uuid": "0C6289B5-23AA-494C-9B43-B4434E86C895",
+				"type": "MeshPhongMaterial",
+				"color": 16383744,
+				"ambient": 16777215,
+				"emissive": 0,
+				"specular": 4868682,
+				"shininess": 1.36
+			},
+			{
+				"uuid": "E567E3CA-F226-4D25-A8D7-5E566DDF110B",
+				"type": "MeshBasicMaterial",
+				"color": 16777215
+			}],
+		"object": {
+			"uuid": "31517222-A9A7-4EAF-B5F6-60751C0BABA3",
+			"type": "Scene",
+			"name": "Scene",
+			"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
+			"children": [
+				{
+					"uuid": "0EB3C04E-B82F-4966-A387-9F6D2B7DA9E3",
+					"type": "Mesh",
+					"name": "Moon",
+					"geometry": "6857405D-D544-4F32-B892-981CF816C4D6",
+					"material": "6C920858-323D-4C45-BC26-C1271065E8F0",
+					"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,-299.7878112792969,512.4142456054688,-73.80562591552734,1]
+				},
+				{
+					"uuid": "5AF455EC-A21A-4340-B232-5A26DF56E56B",
+					"type": "DirectionalLight",
+					"name": "Spot",
+					"color": 16777215,
+					"intensity": 0.68,
+					"matrix": [0.05209210142493248,1.2842384576797485,0.830010712146759,0,-1.2030394077301025,0.5470532774925232,-0.7709274291992188,0,-0.9438658952713013,-0.6263898015022278,1.0284227132797241,0,165.25999450683594,386.739990234375,140.60000610351562,1]
+				},
+				{
+					"uuid": "EFB1376E-5B88-4D74-89C8-8D6926B33CAA",
+					"type": "Mesh",
+					"name": "Player",
+					"geometry": "FEC87C68-8BAB-411C-BDA4-ECAEE32FC387",
+					"material": "716EB8D8-2855-40D7-9584-DCE7323E3CF7",
+					"matrix": [0.9032402634620667,0,0.42913517355918884,0,0,1,0,0,-0.42913517355918884,0,0.9032402634620667,0,111.66000366210938,48.14688491821289,-52.31999969482422,1],
+					"children": [
+						{
+							"uuid": "CBAF5D50-E555-4D73-A5D1-1CB7A7F8FF3C",
+							"type": "PointLight",
+							"name": "Light",
+							"color": 16777215,
+							"intensity": 1,
+							"distance": 0,
+							"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,-79.06999969482422,156.4600067138672,88.52999877929688,1]
+						},
+						{
+							"uuid": "9C3A788A-9D62-425E-B902-C791E2EF5D22",
+							"type": "Mesh",
+							"name": "Sphere 13",
+							"geometry": "19CBCC48-9D9C-491E-83EB-85DAF6451D50",
+							"material": "D5ED5CA9-B036-4574-BD1C-C78581D39297",
+							"matrix": [0.5993204116821289,0,0.028549006208777428,0,0,0.2199999988079071,0,0,-0.028549006208777428,0,0.5993204116821289,0,0,46.093177795410156,0,1]
+						}]
+				},
+				{
+					"uuid": "C0B18839-8DCF-41A8-8E9D-6628088B3891",
+					"type": "Group",
+					"name": "GroundObjects",
+					"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
+					"children": [
+						{
+							"uuid": "040A4F33-A058-4866-BD02-12EFCDF8DAB5",
+							"type": "Mesh",
+							"name": "Ground",
+							"geometry": "1601F7CB-A2F3-40CF-9D65-8267EEFC1ABB",
+							"material": "3B4CD083-1B6B-4CA7-A353-D77E031C7390",
+							"matrix": [17.346343994140625,0.007363505661487579,-3.4699296951293945,0,-3.4699347019195557,0.012008994817733765,-17.346342086791992,0,-0.004864887334406376,17.68999481201172,0.01322006992995739,0,-2.950000047683716,-0.029999999329447746,10.960000038146973,1]
+						},
+						{
+							"uuid": "0C56F065-0120-4E69-A2C1-B06CDEA03297",
+							"type": "Mesh",
+							"name": "Montagne",
+							"geometry": "271650BD-5A36-4BB0-8235-7B37FA771C67",
+							"material": "ABC07BFE-8A0D-4381-BAD1-2E3E29D874F6",
+							"matrix": [3.559999942779541,0,0,0,0,2.3299999237060547,0,0,0,0,3.559999942779541,0,-320.3900146484375,-76.72392272949219,404.9800109863281,1]
+						}]
+				},
+				{
+					"uuid": "F39CCFC4-0E73-45E8-814B-1FE49EC06C0F",
+					"type": "Group",
+					"name": "Points",
+					"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
+					"children": [
+						{
+							"uuid": "F0B17137-32C8-4E1B-AFB4-0D4E50BEA18F",
+							"type": "Mesh",
+							"name": "P1",
+							"geometry": "4E7EEC6A-2368-4496-B7FD-F6DF75772F04",
+							"material": "0C6289B5-23AA-494C-9B43-B4434E86C895",
+							"matrix": [-0.054987821727991104,0,-0.5099040865898132,0,0,0.5128604769706726,0,0,0.5099040865898132,0,-0.054987821727991104,0,-269.3399963378906,96.8499984741211,0,1]
+						}]
+				},
+				{
+					"uuid": "D4177066-9AD8-4D90-A8F7-B5D8EB514F0E",
+					"type": "Mesh",
+					"name": "Particle",
+					"geometry": "FF274308-E1D9-4FC5-A10A-5B1852465892",
+					"material": "E567E3CA-F226-4D25-A8D7-5E566DDF110B",
+					"matrix": [0.30000001192092896,0,0,0,0,0.30000001192092896,0,0,0,0,0.30000001192092896,0,-13.079999923706055,713.1170654296875,1197.204345703125,1]
+				},
+				{
+					"uuid": "0BD765A1-CAAF-45EE-8031-C7DB68FE66B0",
+					"type": "PerspectiveCamera",
+					"name": "Camera",
+					"fov": 50,
+					"aspect": 1,
+					"near": 1,
+					"far": 10000,
+					"matrix": [0.9351965188980103,2.0190227267846694e-9,0.3541291058063507,0,0.23693802952766418,0.7431972026824951,-0.6257142424583435,0,-0.2631877660751343,0.6690724492073059,0.695035457611084,0,0,1131.081787109375,2208.0712890625,1]
+				}]
+		}
+	},
+	"scripts": {
+		"EFB1376E-5B88-4D74-89C8-8D6926B33CAA": [
+			{
+				"name": "move",
+				"source": "var controls = {\n\tleft:37,\n\tright:39,\n\tup:38,\n\tdown:40,\n}\nvar keys = {}\nfor(var i = 0;i < 200;i++){ keys[i] = false; }\n\nfunction keydown( event ){\n\tkeys[event.keyCode] = true;\n}\n\nfunction keyup( event ){\n\tkeys[event.keyCode] = false;\n}\n\nfunction update( event ) {\n\tvar direction = new THREE.Vector3();\n\tdirection.x = keys[controls.left] ? 1 : keys[controls.right] ? -1 : 0;\n\tdirection.z = keys[controls.up] ? 1 : keys[controls.down] ? -1 : 0;\n\t//console.log(direction);\n\tthis.translateZ( direction.z*10 );\n\tthis.rotateY( direction.x*0.1 );\n\t\n\tvar pt = this.parent.getObjectByName('Points').getObjectByName('P1');\n\tvar dist = pt.position.distanceTo(this.position);\n\t//console.log(dist);\n\tif(dist < 100){\n\t\tif(pt.visible){\n\t\t\tpt.visible = false;\n\t\t}\n\t}\n}"
+			}],
+		"31517222-A9A7-4EAF-B5F6-60751C0BABA3": [],
+		"0BD765A1-CAAF-45EE-8031-C7DB68FE66B0": [
+			{
+				"name": "",
+				"source": "function update( event ) {\n\tAPP.setCamera(this);\n}"
+			}]
+	}
+}
