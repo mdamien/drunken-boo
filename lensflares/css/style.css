@@ -1,0 +1,43 @@
+body {
+	background:#000;
+	padding:0;
+	margin:0;
+	font-weight: bold;
+	overflow:hidden;
+}
+
+#info {
+	position: absolute;
+	top: 10px; width: 100%;
+	color: #ffffff;
+	padding: 5px;
+	font-family: Monospace;
+	font-size: 13px;
+	text-align: center;
+	z-index:100;
+}
+
+a {
+	color: orange;
+	text-decoration: none;
+}
+
+a:hover {
+	color: #0080ff;
+}
+
+#stats { 
+	position: absolute; top:0; left: 0 
+}
+
+#stats #fps { 
+	background: transparent !important 
+}
+
+#stats #fps #fpsText {
+	color: #aaa !important 
+}
+
+#stats #fps #fpsGraph {
+	display: none
+}
