@@ -11,13 +11,19 @@ Game.init = function () {
 	Game.camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 15000 );
 	Game.camera.position.z = 250;
 
-	Game.controls = new THREE.FlyControls( Game.camera );
+	if(!window.mobilecheck()) {
+		Game.controls = new THREE.FlyControls( Game.camera );
 
-	Game.controls.movementSpeed = 2500;
-	Game.controls.domElement = Game.container;
-	Game.controls.rollSpeed = Math.PI / 6;
-	Game.controls.autoForward = false;
-	Game.controls.dragToLook = false
+		Game.controls.movementSpeed = 2500;
+		Game.controls.domElement = Game.container;
+		Game.controls.rollSpeed = Math.PI / 6;
+		Game.controls.autoForward = false;
+		Game.controls.dragToLook = false
+	}
+	else
+	{
+		//Game.controls = new Temporary
+	}
 
 	// Game.scene
 
