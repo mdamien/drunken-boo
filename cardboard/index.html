@@ -8,6 +8,7 @@
       body {
         margin: 0px;
         overflow: hidden;
+        background: black;
       }
       #example {
         position: absolute;
@@ -25,10 +26,51 @@
   <script src="js/third-party/threejs/StereoEffect.js"></script>
   <script src="js/third-party/threejs/DeviceOrientationControls.js"></script>
   <script src="js/third-party/threejs/OrbitControls.js"></script>
+  <script src="js/FlyControls.js"></script>
+
+<script>
+function add_shit(){
+
+  var ambient = new THREE.AmbientLight( 0xffffff );
+  ambient.color.setHSL( 0.1, 0.3, 0.2 );
+  scene.add( ambient );
+
+
+  var dirLight = new THREE.DirectionalLight( 0xffffff, 0.125 );
+  dirLight.position.set( 0, -1, 0 ).normalize();
+  scene.add( dirLight );
+
+  dirLight.color.setHSL( 0.1, 0.7, 0.5 );
+
+  var s = 250;
+
+  var cube = new THREE.BoxGeometry( s, s, s );
+  var material = new THREE.MeshPhongMaterial( { ambient: 0x333333, color: 0xffffff, specular: 0xffffff, shininess: 50 } );
+
+
+  for ( var i = 0; i < 3000; i ++ ) {
+
+    var mesh = new THREE.Mesh( cube, material );
+
+    mesh.position.x = 8000 * ( 2.0 * Math.random() - 1.0 );
+    mesh.position.y = 8000 * ( 2.0 * Math.random() - 1.0 );
+    mesh.position.z = 8000 * ( 2.0 * Math.random() - 1.0 );
+
+    mesh.rotation.x = Math.random() * Math.PI;
+    mesh.rotation.y = Math.random() * Math.PI;
+    mesh.rotation.z = Math.random() * Math.PI;
+
+    mesh.matrixAutoUpdate = false;
+    mesh.updateMatrix();
+
+    scene.add( mesh );
+  }
+}
+</script>
 
   <script>
     var camera, scene, renderer;
-    var effect, controls;
+    var effect, controls, controls2;
     var element, container;
 
     var clock = new THREE.Clock();
@@ -37,7 +79,7 @@
     animate();
 
     function init() {
-      renderer = new THREE.WebGLRenderer();
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
       element = renderer.domElement;
       container = document.getElementById('example');
       container.appendChild(element);
@@ -46,7 +88,7 @@
 
       scene = new THREE.Scene();
 
-      camera = new THREE.PerspectiveCamera(90, 1, 0.001, 700);
+      camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 15000);
       camera.position.set(0, 10, 0);
       scene.add(camera);
 
@@ -59,6 +101,15 @@
       );
       controls.noZoom = true;
       controls.noPan = true;
+/*
+      controls2 = new THREE.FlyControls( camera );
+
+      controls2.movementSpeed = 2500;
+      controls2.domElement = container;
+      controls2.rollSpeed = Math.PI / 6;
+      controls2.autoForward = false;
+      controls2.dragToLook = false
+*/
 
       function setOrientationControls(e) {
         if (!e.alpha) {
@@ -75,31 +126,7 @@
       }
       window.addEventListener('deviceorientation', setOrientationControls, true);
 
-
-      var light = new THREE.HemisphereLight(0x777777, 0x000000, 0.6);
-      scene.add(light);
-
-      var texture = THREE.ImageUtils.loadTexture(
-        'textures/patterns/checker.png'
-      );
-      texture.wrapS = THREE.RepeatWrapping;
-      texture.wrapT = THREE.RepeatWrapping;
-      texture.repeat = new THREE.Vector2(50, 50);
-      texture.anisotropy = renderer.getMaxAnisotropy();
-
-      var material = new THREE.MeshPhongMaterial({
-        color: 0xffffff,
-        specular: 0xffffff,
-        shininess: 20,
-        shading: THREE.FlatShading,
-        map: texture
-      });
-
-      var geometry = new THREE.PlaneGeometry(1000, 1000);
-
-      var mesh = new THREE.Mesh(geometry, material);
-      mesh.rotation.x = -Math.PI / 2;
-      scene.add(mesh);
+      add_shit();
 
       window.addEventListener('resize', resize, false);
       setTimeout(resize, 1);
@@ -122,6 +149,10 @@
       camera.updateProjectionMatrix();
 
       controls.update(dt);
+
+      //controls2.update(dt);
+
+      //camera.position.x += dt*100;
     }
 
     function render(dt) {
