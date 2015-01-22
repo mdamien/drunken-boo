@@ -68,9 +68,9 @@ Game.init = function () {
 
 	// lens flares
 
-	Game.textureFlare0 = THREE.ImageUtils.loadTexture( "textures/lensflare/lensflare0.png" );
-	Game.textureFlare2 = THREE.ImageUtils.loadTexture( "textures/lensflare/lensflare2.png" );
-	Game.textureFlare3 = THREE.ImageUtils.loadTexture( "textures/lensflare/lensflare3.png" );
+	Game.textureFlare0 = THREE.ImageUtils.loadTexture( "textures/lensflare0.png" );
+	Game.textureFlare2 = THREE.ImageUtils.loadTexture( "textures/lensflare2.png" );
+	Game.textureFlare3 = THREE.ImageUtils.loadTexture( "textures/lensflare3.png" );
 
 	this.addLight( 0.55, 0.9, 0.5, 5000, 0, -1000 );
 	this.addLight( 0.08, 0.8, 0.5,    0, 0, -1000 );
@@ -85,6 +85,8 @@ Game.init = function () {
 	Game.renderer.setPixelRatio( window.devicePixelRatio );
 	Game.renderer.setSize( window.innerWidth, window.innerHeight );
 	Game.container.appendChild( Game.renderer.domElement );
+
+    Game.effect = new THREE.StereoEffect(Game.renderer);
 
 	//
 
@@ -155,12 +157,16 @@ Game.lensFlareUpdateCallback = function (object) {
 //
 
 Game.onWindowResize = function( event ) {
-
-	Game.renderer.setSize( window.innerWidth, window.innerHeight );
-
-	Game.camera.aspect = window.innerWidth / window.innerHeight;
 	Game.camera.updateProjectionMatrix();
 
+	var width = window.innerWidth;
+	var height = window.innerHeight;
+
+	Game.camera.aspect = width / height;
+	Game.camera.updateProjectionMatrix();
+
+	Game.renderer.setSize(width, height);
+	Game.effect.setSize(width, height);
 }
 
 //
@@ -179,7 +185,9 @@ Game.render = function () {
 	var delta = Game.clock.getDelta();
 
 	Game.controls.update( delta );
-	Game.renderer.render( Game.scene, Game.camera );
+	
+	//Game.effect.render( Game.scene, Game.camera );
+	Game.effect.render( Game.scene, Game.camera );
 
 }
 
