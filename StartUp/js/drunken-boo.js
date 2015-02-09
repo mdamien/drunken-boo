@@ -2,47 +2,48 @@ window.Game = window.Game || {};
 
 Game.init = function () {
     Game.clock = new THREE.Clock();
-    Game.isdisplayedOn3D = false;
+    Game.isdisplayedOn3D = true;
 
     Game.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+
     Game.element = Game.renderer.domElement;
     Game.container = document.getElementById('example');
     Game.container.appendChild(Game.element);
 
     //instanciate a new stereoEffect even if it's not used afterward
     Game.effect = new THREE.StereoEffect(Game.renderer);
-
     Game.scene = new THREE.Scene();
 
     Game.camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 15000);
     Game.camera.position.set(0, 10, 0);
     Game.scene.add(Game.camera);
 
-    Game.controls = new THREE.OrbitControls(Game.camera, Game.element);
-    Game.controls.rotateUp(Math.PI / 4);
-    Game.controls.target.set(
-    Game.camera.position.x + 0.1,
-    Game.camera.position.y,
-    Game.camera.position.z
-    );
-    Game.controls.noZoom = true;
-    Game.controls.noPan = true;
+    Game.controls;
+    if(Game.isdisplayedOn3D){
+        Game.controls = new THREE.OrbitControls(Game.camera, Game.element);
+        Game.controls.rotateUp(Math.PI / 4);
+        Game.controls.target.set(
+            Game.camera.position.x + 0.1,
+            Game.camera.position.y,
+            Game.camera.position.z
+        );
+        Game.controls.noZoom = true;
+        Game.controls.noPan = true;
+    }
+    else
+    {
+        Game.controls = new THREE.FlyControls( Game.camera );
+        Game.controls.movementSpeed = 2500;
+        Game.controls.domElement = Game.container;
+        Game.controls.rollSpeed = Math.PI / 6;
+        Game.controls.autoForward = false;
+        Game.controls.dragToLook = false
+    }
 
-      
-/*
-      Game.controls2 = new THREE.FlyControls( Game.camera );
-
-      controls2.movementSpeed = 2500;
-      controls2.domElement = Game.container;
-      controls2.rollSpeed = Math.PI / 6;
-      controls2.autoForward = false;
-      controls2.dragToLook = false
-*/
-
-      function setOrientationControls(e) {
-        if (!e.alpha) {
-          return;
-        }
+    function setOrientationControls(e) {
+    if (!e.alpha) {
+      return;
+    }
 
         controls = new THREE.DeviceOrientationControls(Game.camera, true);
         controls.connect();
@@ -54,7 +55,8 @@ Game.init = function () {
       }
       window.addEventListener('deviceorientation', setOrientationControls, true);
 
-      //Game.add_elements();
+      //demo taken from the threeJs repository
+      Game.add_elements();
 
       window.addEventListener('resize', Game.resize, false);
       setTimeout(Game.resize, 1);	
@@ -164,9 +166,14 @@ Game.update = function (dt)
 
     Game.camera.updateProjectionMatrix();
 
-    Game.controls.update(dt);
+    if(Game.isdisplayedOn3D) {
+        Game.controls.update(dt);
+    }
+    else {
+        Game.controls.update(dt);
+    }
 
-    //controls2.update(dt);
+
 
     //Game.camera.position.x += dt*100;
 }
