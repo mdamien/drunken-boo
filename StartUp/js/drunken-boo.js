@@ -1,6 +1,66 @@
 window.Game = window.Game || {};
 
-Game.add_element = function ()
+Game.init = function () {
+    Game.clock = new THREE.Clock();
+    Game.isdisplayedOn3D = false;
+
+    Game.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    Game.element = Game.renderer.domElement;
+    Game.container = document.getElementById('example');
+    Game.container.appendChild(Game.element);
+
+    //instanciate a new stereoEffect even if it's not used afterward
+    Game.effect = new THREE.StereoEffect(Game.renderer);
+
+    Game.scene = new THREE.Scene();
+
+    Game.camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 15000);
+    Game.camera.position.set(0, 10, 0);
+    Game.scene.add(Game.camera);
+
+    Game.controls = new THREE.OrbitControls(Game.camera, Game.element);
+    Game.controls.rotateUp(Math.PI / 4);
+    Game.controls.target.set(
+    Game.camera.position.x + 0.1,
+    Game.camera.position.y,
+    Game.camera.position.z
+    );
+    Game.controls.noZoom = true;
+    Game.controls.noPan = true;
+
+      
+/*
+      Game.controls2 = new THREE.FlyControls( Game.camera );
+
+      controls2.movementSpeed = 2500;
+      controls2.domElement = Game.container;
+      controls2.rollSpeed = Math.PI / 6;
+      controls2.autoForward = false;
+      controls2.dragToLook = false
+*/
+
+      function setOrientationControls(e) {
+        if (!e.alpha) {
+          return;
+        }
+
+        controls = new THREE.DeviceOrientationControls(Game.camera, true);
+        controls.connect();
+        controls.update();
+
+        Game.element.addEventListener('click', Game.fullscreen, false);
+
+        window.removeEventListener('deviceorientation', setOrientationControls, true);
+      }
+      window.addEventListener('deviceorientation', setOrientationControls, true);
+
+      //Game.add_elements();
+
+      window.addEventListener('resize', Game.resize, false);
+      setTimeout(Game.resize, 1);	
+}
+
+Game.add_elements = function ()
 {
   var ambient = new THREE.AmbientLight( 0xffffff );
   ambient.color.setHSL( 0.1, 0.3, 0.2 );
@@ -36,70 +96,51 @@ Game.add_element = function ()
 
     Game.scene.add( mesh );
   }
-}
 
-Game.init = function () {
-	  Game.clock = new THREE.Clock();
+    var ambient = new THREE.AmbientLight( 0xffffff );
+    ambient.color.setHSL( 0.1, 0.3, 0.2 );
+    Game.scene.add( ambient );
 
-	  Game.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-      Game.element = Game.renderer.domElement;
-      Game.container = document.getElementById('example');
-      Game.container.appendChild(Game.element);
 
-      Game.effect = new THREE.StereoEffect(Game.renderer);
+    var dirLight = new THREE.DirectionalLight( 0xffffff, 0.125 );
+    dirLight.position.set( 0, -1, 0 ).normalize();
+    Game.scene.add( dirLight );
 
-      Game.scene = new THREE.Scene();
+    dirLight.color.setHSL( 0.1, 0.7, 0.5 );
 
-      Game.camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 15000);
-      Game.camera.position.set(0, 10, 0);
-      Game.scene.add(Game.camera);
+    /*Game.textureFlare0 = THREE.ImageUtils.loadTexture( "textures/lensflare0.png" );
+    Game.textureFlare2 = THREE.ImageUtils.loadTexture( "textures/lensflare2.png" );
+    Game.textureFlare3 = THREE.ImageUtils.loadTexture( "textures/lensflare3.png" );
 
-      Game.controls = new THREE.OrbitControls(Game.camera, Game.element);
-      Game.controls.rotateUp(Math.PI / 4);
-      Game.controls.target.set(
-        Game.camera.position.x + 0.1,
-        Game.camera.position.y,
-        Game.camera.position.z
-      );
-      Game.controls.noZoom = true;
-      Game.controls.noPan = true;
-
-      
-/*
-      Game.controls2 = new THREE.FlyControls( Game.camera );
-
-      controls2.movementSpeed = 2500;
-      controls2.domElement = Game.container;
-      controls2.rollSpeed = Math.PI / 6;
-      controls2.autoForward = false;
-      controls2.dragToLook = false
-*/
-
-      function setOrientationControls(e) {
-        if (!e.alpha) {
-          return;
-        }
-
-        controls = new THREE.DeviceOrientationControls(Game.camera, true);
-        controls.connect();
-        controls.update();
-
-        Game.element.addEventListener('click', Game.fullscreen, false);
-
-        window.removeEventListener('deviceorientation', setOrientationControls, true);
-      }
-      window.addEventListener('deviceorientation', setOrientationControls, true);
-
-      Game.add_element();
-
-      window.addEventListener('resize', Game.resize, false);
-      setTimeout(Game.resize, 1);	
+    this.addLight( 0.55, 0.9, 0.5, 5000, 0, -1000 );
+    this.addLight( 0.08, 0.8, 0.5,    0, 0, -1000 );
+    this.addLight( 0.995, 0.5, 0.9, 5000, 5000, -1000 );*/
 }
 
 Game.addLight = function ( h, s, l, x, y, z ) {
+    var light = new THREE.PointLight( 0xffffff, 1.5, 4500 );
+    light.color.setHSL( h, s, l );
+    light.position.set( x, y, z );
+    Game.scene.add( light );
 
-	
+    var flareColor = new THREE.Color( 0xffffff );
+    flareColor.setHSL( h, s, l + 0.5 );
 
+    var lensFlare = new THREE.LensFlare( Game.textureFlare0, 700, 0.0, THREE.AdditiveBlending, flareColor );
+
+    lensFlare.add( Game.textureFlare2, 512, 0.0, THREE.AdditiveBlending );
+    lensFlare.add( Game.textureFlare2, 512, 0.0, THREE.AdditiveBlending );
+    lensFlare.add( Game.textureFlare2, 512, 0.0, THREE.AdditiveBlending );
+
+    lensFlare.add( Game.textureFlare3, 60, 0.6, THREE.AdditiveBlending );
+    lensFlare.add( Game.textureFlare3, 70, 0.7, THREE.AdditiveBlending );
+    lensFlare.add( Game.textureFlare3, 120, 0.9, THREE.AdditiveBlending );
+    lensFlare.add( Game.textureFlare3, 70, 1.0, THREE.AdditiveBlending );
+
+    lensFlare.customUpdateCallback = Game.lensFlareUpdateCallback;
+    lensFlare.position.copy( light.position );
+
+    Game.scene.add( lensFlare );
 }
 
 Game.resize = function ()
@@ -111,7 +152,9 @@ Game.resize = function ()
 	Game.camera.updateProjectionMatrix();
 
 	Game.renderer.setSize(width, height);
-	Game.effect.setSize(width, height);
+    if(Game.isdisplayedOn3D) {
+	   Game.effect.setSize(width, height);
+    }
 }
 
 
@@ -129,14 +172,16 @@ Game.update = function (dt)
 }
 
 Game.onWindowResize = function( event ) {
-	 var width = Game.container.offsetWidth;
-      var height = Game.container.offsetHeight;
+	var width = Game.container.offsetWidth;
+    var height = Game.container.offsetHeight;
 
-      Game.camera.aspect = width / height;
-      Game.camera.updateProjectionMatrix();
+    Game.camera.aspect = width / height;
+    Game.camera.updateProjectionMatrix();
 
-      Game.renderer.setSize(width, height);
-      Game.effect.setSize(width, height);
+    Game.renderer.setSize(width, height);
+    if(Game.isdisplayedOn3D) {
+        Game.effect.setSize(width, height);
+    }
 }
 
 //
@@ -149,7 +194,13 @@ Game.animate = function() {
 }
 
 Game.render = function () {
-  Game.effect.render(Game.scene, Game.camera);
+    if (Game.isdisplayedOn3D) {
+        Game.effect.render(Game.scene, Game.camera);
+    }
+    else
+    {
+        Game.renderer.render(Game.scene, Game.camera);
+    }
 }
 
 Game.fullscreen = function () {
