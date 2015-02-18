@@ -99,15 +99,6 @@ Game.add_elements = function ()
     Game.scene.add( mesh );
   }
 
-    var ambient = new THREE.AmbientLight( 0xffffff );
-    ambient.color.setHSL( 0.1, 0.3, 0.2 );
-    Game.scene.add( ambient );
-
-
-    var dirLight = new THREE.DirectionalLight( 0xffffff, 0.125 );
-    dirLight.position.set( 0, -1, 0 ).normalize();
-    Game.scene.add( dirLight );
-
     dirLight.color.setHSL( 0.1, 0.7, 0.5 );
 
     /*Game.textureFlare0 = THREE.ImageUtils.loadTexture( "textures/lensflare0.png" );
