@@ -18,7 +18,7 @@ Game.init = function () {
     Game.camera.position.set(0, 10, 0);
     Game.scene.add(Game.camera);
 
-    Game.controls;
+/*    Game.controls;
     if(Game.isdisplayedOn3D){
         Game.controls = new THREE.OrbitControls(Game.camera, Game.element);
         Game.controls.rotateUp(Math.PI / 4);
@@ -39,15 +39,15 @@ Game.init = function () {
         Game.controls.autoForward = false;
         Game.controls.dragToLook = false
     }
-
+*/
     function setOrientationControls(e) {
     if (!e.alpha) {
       return;
     }
 
-        controls = new THREE.DeviceOrientationControls(Game.camera, true);
+/*        controls = new THREE.DeviceOrientationControls(Game.camera, true);
         controls.connect();
-        controls.update();
+        controls.update();*/
 
         Game.element.addEventListener('click', Game.fullscreen, false);
 
@@ -166,12 +166,12 @@ Game.update = function (dt)
 
     Game.camera.updateProjectionMatrix();
 
-    if(Game.isdisplayedOn3D) {
+/*    if(Game.isdisplayedOn3D) {
         Game.controls.update(dt);
     }
     else {
         Game.controls.update(dt);
-    }
+    }*/
 
 
 
