@@ -80,25 +80,6 @@ Game.add_elements = function ()
   var cube = new THREE.BoxGeometry( s, s, s );
   var material = new THREE.MeshPhongMaterial( { ambient: 0x333333, color: 0xffffff, specular: 0xffffff, shininess: 50 } );
 
-
-  for ( var i = 0; i < 3000; i ++ ) {
-
-    var mesh = new THREE.Mesh( cube, material );
-
-    mesh.position.x = 8000 * ( 2.0 * Math.random() - 1.0 );
-    mesh.position.y = 8000 * ( 2.0 * Math.random() - 1.0 );
-    mesh.position.z = 8000 * ( 2.0 * Math.random() - 1.0 );
-
-    mesh.rotation.x = Math.random() * Math.PI;
-    mesh.rotation.y = Math.random() * Math.PI;
-    mesh.rotation.z = Math.random() * Math.PI;
-
-    mesh.matrixAutoUpdate = false;
-    mesh.updateMatrix();
-
-    Game.scene.add( mesh );
-  }
-
     var ambient = new THREE.AmbientLight( 0xffffff );
     ambient.color.setHSL( 0.1, 0.3, 0.2 );
     Game.scene.add( ambient );
