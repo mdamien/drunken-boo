@@ -15,7 +15,6 @@ Game.init = function () {
     Game.scene = new THREE.Scene();
 
     Game.camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 15000);
-    Game.camera.position.set(0, 2, 0);
     //Game.camera.rotation.y = THREE.Math.degToRad(0);
    // Game.camera.lookAt(new THREE.Vector3(0,0,0));
     Game.scene.add(Game.camera);
@@ -30,6 +29,9 @@ Game.init = function () {
     Game.path = Game.calculatePath();
     Game.currentCheckpoint = 0;
 
+    Game.camera.position.copy(Game.path[Game.currentCheckpoint]);
+
+    // console.log(Game.camera.position);
 
     // for(var i=0; i<Game.path.length; i++)
     //     console.log(Game.path[i]);
@@ -130,7 +132,7 @@ Game.calculatePath = function()
     var checkpoints = 3;
 
     for(var i=0; i<checkpoints; i++)
-        path.push(new THREE.Vector3( 0, 2, -100*i ));
+        path.push(new THREE.Vector3( 0, 2, 256*i ));
 
     return path;
 }
@@ -219,6 +221,8 @@ Game.update = function (dt)
 
     var translateDistance = Game.PlayerSpeed*dt;
 
+    Game.update.vectorMove = Game.update.vectorMove || new THREE.Vector3;
+
     if(Game.camera.position.distanceTo(Game.path[Game.currentCheckpoint]) < translateDistance)
     {
         if(Game.currentCheckpoint < Game.path.length-1)
@@ -226,10 +230,17 @@ Game.update = function (dt)
         else
             Game.currentCheckpoint=0;
 
-        console.log(Game.currentCheckpoint);
+        Game.update.vectorMove.subVectors(Game.path[Game.currentCheckpoint],Game.camera.position);
+        // substract position vector of the camera from position vector of the checkpoint to get translation vector
+        //console.log(Game.update.vectorMove);
+
+        Game.camera.lookAt(Game.path[Game.currentCheckpoint]);
+        console.log(Game.camera.rotation);
     }
 
-    Game.camera.translateOnAxis((new THREE.Vector3).subVectors(Game.path[Game.currentCheckpoint],Game.camera.position).normalize(), translateDistance);
+
+    //Game.camera.translateOnAxis(Game.update.vectorMove.normalize(), translateDistance);
+    Game.camera.translateZ(-translateDistance);
 
 /*    if(Game.isdisplayedOn3D) {
         Game.controls.update(dt);
