@@ -15,10 +15,28 @@ Game.init = function () {
     Game.scene = new THREE.Scene();
 
     Game.camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 15000);
-    Game.camera.position.set(0, 10, 0);
+    //Game.camera.rotation.y = THREE.Math.degToRad(0);
+   // Game.camera.lookAt(new THREE.Vector3(0,0,0));
     Game.scene.add(Game.camera);
 
-    Game.controls;
+    Game.renderer.shadowMapEnabled = true;
+    Game.renderer.shadowMapSoft = true;
+
+    Game.createTerrain();
+
+    Game.PlayerSpeed = 20;
+
+    Game.path = Game.calculatePath();
+    Game.currentCheckpoint = 0;
+
+    Game.camera.position.copy(Game.path[Game.currentCheckpoint]);
+
+    // console.log(Game.camera.position);
+
+    // for(var i=0; i<Game.path.length; i++)
+    //     console.log(Game.path[i]);
+
+/*    Game.controls;
     if(Game.isdisplayedOn3D){
         Game.controls = new THREE.OrbitControls(Game.camera, Game.element);
         Game.controls.rotateUp(Math.PI / 4);
@@ -39,15 +57,15 @@ Game.init = function () {
         Game.controls.autoForward = false;
         Game.controls.dragToLook = false
     }
-
+*/
     function setOrientationControls(e) {
     if (!e.alpha) {
       return;
     }
 
-        controls = new THREE.DeviceOrientationControls(Game.camera, true);
+/*        controls = new THREE.DeviceOrientationControls(Game.camera, true);
         controls.connect();
-        controls.update();
+        controls.update();*/
 
         Game.element.addEventListener('click', Game.fullscreen, false);
 
@@ -59,44 +77,42 @@ Game.init = function () {
       Game.add_elements();
 
       window.addEventListener('resize', Game.resize, false);
-      setTimeout(Game.resize, 1);	
+      setTimeout(Game.resize, 1);   
 }
 
-Game.add_elements = function ()
+Game.createTerrain = function()
 {
-  var ambient = new THREE.AmbientLight( 0xffffff );
-  ambient.color.setHSL( 0.1, 0.3, 0.2 );
-  Game.scene.add( ambient );
+    var terrainWidth = 1024;
+    var boxWidth = 5;
+    var boxHeight = 20;
+    var density = 0.3;
+    var planeGeometry = new THREE.PlaneGeometry(terrainWidth, terrainWidth);
+    var material = new THREE.MeshPhongMaterial( { ambient: 0x333333, color: 0xffffff, specular: 0xffffff, shininess: 50 } );
 
+    var terrainMesh = new THREE.Mesh(planeGeometry, material);
 
-  var dirLight = new THREE.DirectionalLight( 0xffffff, 0.125 );
-  dirLight.position.set( 0, -1, 0 ).normalize();
-  Game.scene.add( dirLight );
+    terrainMesh.receiveShadow = true;
 
-  dirLight.color.setHSL( 0.1, 0.7, 0.5 );
+    terrainMesh.rotation.x = THREE.Math.degToRad(-90);
+    terrainMesh.updateMatrix();
 
-  var s = 250;
+    for(var i=0; i<terrainWidth*terrainWidth*density/(100*boxWidth*boxWidth); i++)
+    {
+        var boxGeometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxWidth);
+        var boxMaterial = new THREE.MeshPhongMaterial( { ambient: '#'+Math.floor(Math.random()*16777215).toString(16)
+, color: 0xffffff, specular: 0xffffff, shininess: 50 } );
 
-  var cube = new THREE.BoxGeometry( s, s, s );
-  var material = new THREE.MeshPhongMaterial( { ambient: 0x333333, color: 0xffffff, specular: 0xffffff, shininess: 50 } );
+        var boxMesh = new THREE.Mesh(boxGeometry, boxMaterial);
 
+        boxMesh.position.x = terrainWidth/2 * ( 2.0 * Math.random() - 1.0 );
+        boxMesh.position.z = terrainWidth/2 * ( 2.0 * Math.random() - 1.0 );
+        boxMesh.position.y = boxHeight/2;
+        boxMesh.castShadow = true;
 
-  for ( var i = 0; i < 40; i ++ ) {
+        boxMesh.updateMatrix();
 
-    var mesh = new THREE.Mesh( cube, material );
-    mesh.position.x = 8000 * ( 2.0 * Math.random() - 1.0 );
-    mesh.position.y = 8000 * ( 2.0 * Math.random() - 1.0 );
-    mesh.position.z = 8000 * ( 2.0 * Math.random() - 1.0 );
-
-    mesh.rotation.x = Math.random() * Math.PI;
-    mesh.rotation.y = Math.random() * Math.PI;
-    mesh.rotation.z = Math.random() * Math.PI;
-
-    mesh.matrixAutoUpdate = false;
-    mesh.updateMatrix();
-
-    //Game.scene.add( mesh );
-    Game.scene.add( mesh );
+        boxMesh.matrixAutoUpdate = false;
+        Game.scene.add( boxMesh );
   }
 
 var geometry = new THREE.SphereGeometry( 5, 32, 32);
@@ -112,17 +128,46 @@ var material2 = new THREE.MeshBasicMaterial( { color: 0xffffff } );
     
     Game.scene.add( sphere );
   }
+    terrainMesh.matrixAutoUpdate = false;
 
+    Game.scene.add( terrainMesh );
+
+    // console.log("terrain");
+}
+
+Game.calculatePath = function()
+{
+    var path = [];
+    var checkpoints = 3;
+
+    for(var i=0; i<checkpoints; i++)
+        path.push(new THREE.Vector3( 0, 2, 256*i ));
+
+    return path;
+}
+
+Game.add_elements = function ()
+{
     var ambient = new THREE.AmbientLight( 0xffffff );
-    ambient.color.setHSL( 0.1, 0.3, 0.2 );
+    ambient.color.setHSL( 0.1, 0.3, 0.4 );
     Game.scene.add( ambient );
 
 
-    var dirLight = new THREE.DirectionalLight( 0xffffff, 0.125 );
-    dirLight.position.set( 0, -1, 0 ).normalize();
+    var dirLight = new THREE.DirectionalLight( 0xffffff, 0.200 );
+    dirLight.position.set( 512, 1024, 0 );
+    dirLight.color.setHSL( 0.1, 0.7, 1 );
+    dirLight.target.position.set(0, 0, 0);
+    dirLight.castShadow = true;
+    //dirLight.shadowCameraVisible = true; // only for debugging
+
     Game.scene.add( dirLight );
 
-    dirLight.color.setHSL( 0.1, 0.7, 0.5 );
+    var dirLightLeft = new THREE.DirectionalLight( 0xffffff, 0.125 );
+    dirLightLeft.position.set( -10, 0, 0 );
+    dirLightLeft.color.setHSL( 0.1, 0.7, 1 );
+
+    Game.scene.add( dirLightLeft );
+
 
     /*Game.textureFlare0 = THREE.ImageUtils.loadTexture( "textures/lensflare0.png" );
     Game.textureFlare2 = THREE.ImageUtils.loadTexture( "textures/lensflare2.png" );
@@ -161,31 +206,57 @@ Game.addLight = function ( h, s, l, x, y, z ) {
 
 Game.resize = function ()
 {
-	var width = Game.container.offsetWidth;
-	var height = Game.container.offsetHeight;
+    var width = Game.container.offsetWidth;
+    var height = Game.container.offsetHeight;
 
-	Game.camera.aspect = width / height;
-	Game.camera.updateProjectionMatrix();
+    Game.camera.aspect = width / height;
+    Game.camera.updateProjectionMatrix();
 
-	Game.renderer.setSize(width, height);
+    Game.renderer.setSize(width, height);
     if(Game.isdisplayedOn3D) {
-	   Game.effect.setSize(width, height);
+       Game.effect.setSize(width, height);
     }
 }
 
 
 Game.update = function (dt) 
 {
-	Game.resize();
+    Game.resize();
 
     Game.camera.updateProjectionMatrix();
 
-    if(Game.isdisplayedOn3D) {
+    // if distance to the next checkpoint is shorter than distance to travel this tick 
+    // then increment checkpoint
+
+    var translateDistance = Game.PlayerSpeed*dt;
+
+    Game.update.vectorMove = Game.update.vectorMove || new THREE.Vector3;
+
+    if(Game.camera.position.distanceTo(Game.path[Game.currentCheckpoint]) < translateDistance)
+    {
+        if(Game.currentCheckpoint < Game.path.length-1)
+            Game.currentCheckpoint++;
+        else
+            Game.currentCheckpoint=0;
+
+        Game.update.vectorMove.subVectors(Game.path[Game.currentCheckpoint],Game.camera.position);
+        // substract position vector of the camera from position vector of the checkpoint to get translation vector
+        //console.log(Game.update.vectorMove);
+
+        Game.camera.lookAt(Game.path[Game.currentCheckpoint]);
+       // console.log(Game.camera.rotation);
+    }
+
+
+    //Game.camera.translateOnAxis(Game.update.vectorMove.normalize(), translateDistance);
+    Game.camera.translateZ(-translateDistance);
+
+/*    if(Game.isdisplayedOn3D) {
         Game.controls.update(dt);
     }
     else {
         Game.controls.update(dt);
-    }
+    }*/
 
 
 
@@ -193,7 +264,7 @@ Game.update = function (dt)
 }
 
 Game.onWindowResize = function( event ) {
-	var width = Game.container.offsetWidth;
+    var width = Game.container.offsetWidth;
     var height = Game.container.offsetHeight;
 
     Game.camera.aspect = width / height;
@@ -208,10 +279,10 @@ Game.onWindowResize = function( event ) {
 //
 
 Game.animate = function() {
- 	requestAnimationFrame(Game.animate);
+    requestAnimationFrame(Game.animate);
       Game.update(Game.clock.getDelta());
       Game.render(Game.clock.getDelta());
-	
+    
 }
 
 Game.render = function () {
