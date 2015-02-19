@@ -15,7 +15,8 @@ Game.init = function () {
     Game.scene = new THREE.Scene();
 
     Game.camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 15000);
-    Game.camera.position.set(0, 30, 200);
+    Game.camera.position.set(0, 2, 0);
+    //Game.camera.rotation.y = THREE.Math.degToRad(0);
    // Game.camera.lookAt(new THREE.Vector3(0,0,0));
     Game.scene.add(Game.camera);
 
@@ -23,6 +24,15 @@ Game.init = function () {
     Game.renderer.shadowMapSoft = true;
 
     Game.createTerrain();
+
+    Game.PlayerSpeed = 20;
+
+    Game.path = Game.calculatePath();
+    Game.currentCheckpoint = 0;
+
+
+    // for(var i=0; i<Game.path.length; i++)
+    //     console.log(Game.path[i]);
 
 /*    Game.controls;
     if(Game.isdisplayedOn3D){
@@ -72,7 +82,8 @@ Game.createTerrain = function()
 {
     var terrainWidth = 1024;
     var boxWidth = 5;
-    var density = 1;
+    var boxHeight = 20;
+    var density = 0.3;
     var planeGeometry = new THREE.PlaneGeometry(terrainWidth, terrainWidth);
     var material = new THREE.MeshPhongMaterial( { ambient: 0x333333, color: 0xffffff, specular: 0xffffff, shininess: 50 } );
 
@@ -85,7 +96,7 @@ Game.createTerrain = function()
 
     for(var i=0; i<terrainWidth*terrainWidth*density/(100*boxWidth*boxWidth); i++)
     {
-        var boxGeometry = new THREE.BoxGeometry(boxWidth, boxWidth, boxWidth);
+        var boxGeometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxWidth);
         var boxMaterial = new THREE.MeshPhongMaterial( { ambient: '#'+Math.floor(Math.random()*16777215).toString(16)
 , color: 0xffffff, specular: 0xffffff, shininess: 50 } );
 
@@ -93,7 +104,7 @@ Game.createTerrain = function()
 
         boxMesh.position.x = terrainWidth/2 * ( 2.0 * Math.random() - 1.0 );
         boxMesh.position.z = terrainWidth/2 * ( 2.0 * Math.random() - 1.0 );
-        boxMesh.position.y = boxWidth/2;
+        boxMesh.position.y = boxHeight/2;
 
         boxMesh.castShadow = true;
 
@@ -113,6 +124,16 @@ Game.createTerrain = function()
     // console.log("terrain");
 }
 
+Game.calculatePath = function()
+{
+    var path = [];
+    var checkpoints = 3;
+
+    for(var i=0; i<checkpoints; i++)
+        path.push(new THREE.Vector3( 0, 2, -100*i ));
+
+    return path;
+}
 
 Game.add_elements = function ()
 {
@@ -127,8 +148,6 @@ Game.add_elements = function ()
     dirLight.target.position.set(0, 0, 0);
     dirLight.castShadow = true;
     //dirLight.shadowCameraVisible = true; // only for debugging
-    dirLight.shadowMapWidth = 4096;
-    dirLight.shadowMapHeight = dirLight.shadowMapWidth;
 
     Game.scene.add( dirLight );
 
@@ -194,6 +213,23 @@ Game.update = function (dt)
     Game.resize();
 
     Game.camera.updateProjectionMatrix();
+
+    // if distance to the next checkpoint is shorter than distance to travel this tick 
+    // then increment checkpoint
+
+    var translateDistance = Game.PlayerSpeed*dt;
+
+    if(Game.camera.position.distanceTo(Game.path[Game.currentCheckpoint]) < translateDistance)
+    {
+        if(Game.currentCheckpoint < Game.path.length-1)
+            Game.currentCheckpoint++;
+        else
+            Game.currentCheckpoint=0;
+
+        console.log(Game.currentCheckpoint);
+    }
+
+    Game.camera.translateOnAxis((new THREE.Vector3).subVectors(Game.path[Game.currentCheckpoint],Game.camera.position).normalize(), translateDistance);
 
 /*    if(Game.isdisplayedOn3D) {
         Game.controls.update(dt);
