@@ -81,10 +81,9 @@ Game.add_elements = function ()
   var material = new THREE.MeshPhongMaterial( { ambient: 0x333333, color: 0xffffff, specular: 0xffffff, shininess: 50 } );
 
 
-  for ( var i = 0; i < 3000; i ++ ) {
+  for ( var i = 0; i < 40; i ++ ) {
 
     var mesh = new THREE.Mesh( cube, material );
-
     mesh.position.x = 8000 * ( 2.0 * Math.random() - 1.0 );
     mesh.position.y = 8000 * ( 2.0 * Math.random() - 1.0 );
     mesh.position.z = 8000 * ( 2.0 * Math.random() - 1.0 );
@@ -96,7 +95,30 @@ Game.add_elements = function ()
     mesh.matrixAutoUpdate = false;
     mesh.updateMatrix();
 
+    //Game.scene.add( mesh );
     Game.scene.add( mesh );
+  }
+
+
+  geometry = new THREE.SphereGeometry( 5, 32, 32 );
+  var material2 = new THREE.MeshBasicMaterial( { color: 0xffffff } );
+
+  //var sprite = new THREE.Sprite( material ); 
+
+  for ( var i = 0; i < 1000; i ++ ) {
+
+    //var mesh = new THREE.Mesh( cube, material );
+
+    var meshh = new THREE.Mesh(geometry, material2 );
+    meshh.position.x = 8000 * ( 2.0 * Math.random() - 1.0 );
+    meshh.position.y = 8000 * ( 2.0 * Math.random() - 1.0 );
+    meshh.position.z = 8000 * ( 2.0 * Math.random() - 1.0 );
+
+    //mesh.matrixAutoUpdate = false;
+    //mesh.updateMatrix();
+
+    //Game.scene.add( mesh );
+    Game.scene.add( meshh );
   }
 
     var ambient = new THREE.AmbientLight( 0xffffff );
