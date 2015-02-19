@@ -235,7 +235,7 @@ Game.update = function (dt)
         //console.log(Game.update.vectorMove);
 
         Game.camera.lookAt(Game.path[Game.currentCheckpoint]);
-        console.log(Game.camera.rotation);
+       // console.log(Game.camera.rotation);
     }
 
 

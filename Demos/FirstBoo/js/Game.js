@@ -206,7 +206,7 @@ Game.update = function (dt)
 
     Game.camera.updateProjectionMatrix();
 
-    
+   // console.log(Game.mouse);
 
     Game.controls.update(dt);
 
@@ -234,7 +234,7 @@ function onMouseMove( event ) {
     event.preventDefault();
 
     Game.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    Game.mouse.y = (event.clientY / window.innerHeight) * 2 + 1;
+    Game.mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
     //console.log( "Mouse " + Game.mouse.x  + " " + Game.mouse.y );
 }
 
