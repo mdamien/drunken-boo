@@ -107,18 +107,27 @@ Game.createTerrain = function()
         boxMesh.position.x = terrainWidth/2 * ( 2.0 * Math.random() - 1.0 );
         boxMesh.position.z = terrainWidth/2 * ( 2.0 * Math.random() - 1.0 );
         boxMesh.position.y = boxHeight/2;
-
         boxMesh.castShadow = true;
 
         boxMesh.updateMatrix();
 
         boxMesh.matrixAutoUpdate = false;
+        Game.scene.add( boxMesh );
+  }
 
-        Game.scene.add(boxMesh);
-    }
+var geometry = new THREE.SphereGeometry( 5, 32, 32);
+var material2 = new THREE.MeshBasicMaterial( { color: 0xffffff } );
 
-   // mesh.rotation. = ;
 
+  for ( var i = 0; i < 1000; i ++ ) {
+
+    sphere = new THREE.Mesh( geometry, material2);
+    sphere.position.x = 8000 * ( 2.0 * Math.random() - 1.0 );
+    sphere.position.y = 8000 * ( 2.0 * Math.random() - 1.0 );
+    sphere.position.z = 8000 * ( 2.0 * Math.random() - 1.0 );
+    
+    Game.scene.add( sphere );
+  }
     terrainMesh.matrixAutoUpdate = false;
 
     Game.scene.add( terrainMesh );
