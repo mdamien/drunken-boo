@@ -113,6 +113,7 @@ Game.createTerrain = function()
     // console.log("terrain");
 }
 
+
 Game.add_elements = function ()
 {
     var ambient = new THREE.AmbientLight( 0xffffff );
@@ -136,6 +137,7 @@ Game.add_elements = function ()
     dirLightLeft.color.setHSL( 0.1, 0.7, 1 );
 
     Game.scene.add( dirLightLeft );
+
 
     /*Game.textureFlare0 = THREE.ImageUtils.loadTexture( "textures/lensflare0.png" );
     Game.textureFlare2 = THREE.ImageUtils.loadTexture( "textures/lensflare2.png" );
