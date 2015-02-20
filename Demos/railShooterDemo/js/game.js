@@ -24,12 +24,14 @@ Game.init = function () {
 
     Game.createTerrain();
 
-    Game.PlayerSpeed = 20;
+    Game.PlayerSpeed = 2;
 
     Game.path = Game.calculatePath();
     Game.currentCheckpoint = 0;
 
     Game.camera.position.copy(Game.path[Game.currentCheckpoint]);
+
+    Game.TimeBetweenEnnemies = 2;
 
     // console.log(Game.camera.position);
 
@@ -135,24 +137,41 @@ var material2 = new THREE.MeshBasicMaterial( { color: 0xffffff } );
     // console.log("terrain");
 }
 
-Game.spawnEnnemy = function(Vector3PositionPlayer)
+Game.spawnEnnemy = function()
 {
-    var geometry = new THREE.SphereGeometry( this, radius, 32, 32);
-    var material2 = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+    var geometry = new THREE.SphereGeometry(2);
+    var material2 = new THREE.MeshPhongMaterial( { color: 0xffff00 } );
     var ennemyMesh = new THREE.Mesh(geometry, material2);
-    ennemyMesh.position.copy(Vector3PositionPlayer);
-    ennemyMesh.position.z += THREE.Math.randInt(10, 100);
-    ennemyMesh.position.x += (THREE.Math.randInt(0, 1)*2-1)*10;
+
+
+
+    // if(Game.camera.position.distanceTo(Game.path[Game.currentCheckpoint]) < translateDistance)
+
+   // ennemyMesh.position.copy(Vector3PositionPlayer);
+    ennemyMesh.position.z += THREE.Math.randInt(50, 100);
+    // ennemyMesh.position.x += (THREE.Math.randInt(0, 1)*2-1)*10;
+    ennemyMesh.position.x += (THREE.Math.randInt(0, 2)*2-1)*10;
+    ennemyMesh.castShadow = true;
+    ennemyMesh.receiveShadow = true;
     Game.scene.add( ennemyMesh );
+
+    return ennemyMesh.position; // For Debugging purpose
 }
 
 Game.calculatePath = function()
 {
     var path = [];
-    var checkpoints = 4;
+    var checkpoints = 512;
+    var radius = 100;
+    var angle = 2*Math.PI/checkpoints;
 
     for(var i=0; i<checkpoints; i++)
-        path.push(new THREE.Vector3( 0, 2, 128*i ));
+    {
+        path.push(new THREE.Vector3( Math.cos(angle*i)*radius, 2, Math.sin(angle*i)*radius ));
+    }
+
+    // for(var i=0; i<checkpoints; i++)
+    //     path.push(new THREE.Vector3( 0, 2, 128*i ));
 
     return path;
 }
@@ -232,6 +251,14 @@ Game.resize = function ()
 
 Game.update = function (dt) 
 {
+    Game.update.lastEnnemySpawn = Game.update.lastEnnemySpawn || 0;
+
+    if(Game.clock.getElapsedTime () - Game.update.lastEnnemySpawn > Game.TimeBetweenEnnemies)
+    {
+        //console.log(Game.spawnEnnemy());
+        Game.update.lastEnnemySpawn = Game.clock.getElapsedTime ();
+    }
+
     Game.resize();
 
     Game.camera.updateProjectionMatrix();
