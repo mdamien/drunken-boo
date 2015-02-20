@@ -100,20 +100,20 @@ Game.createTerrain = function()
     {
         var boxGeometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxWidth);
         var boxMaterial = new THREE.MeshPhongMaterial( { ambient: '#'+Math.floor(Math.random()*16777215).toString(16)
-, color: 0xffffff, specular: 0xffffff, shininess: 50 } );
+    , color: 0xffffff, specular: 0xffffff, shininess: 50 } );
 
         var boxMesh = new THREE.Mesh(boxGeometry, boxMaterial);
 
         boxMesh.position.x = terrainWidth/2 * ( 2.0 * Math.random() - 1.0 );
-        boxMesh.position.z = terrainWidth/2 * ( 2.0 * Math.random() - 1.0 );
         boxMesh.position.y = boxHeight/2;
+        boxMesh.position.z = terrainWidth/2 * ( 2.0 * Math.random() - 1.0 );
         boxMesh.castShadow = true;
 
         boxMesh.updateMatrix();
 
         boxMesh.matrixAutoUpdate = false;
         Game.scene.add( boxMesh );
-  }
+    }
 
 var geometry = new THREE.SphereGeometry( 5, 32, 32);
 var material2 = new THREE.MeshBasicMaterial( { color: 0xffffff } );
@@ -133,6 +133,17 @@ var material2 = new THREE.MeshBasicMaterial( { color: 0xffffff } );
     Game.scene.add( terrainMesh );
 
     // console.log("terrain");
+}
+
+Game.spawnEnnemy = function(Vector3PositionPlayer)
+{
+    var geometry = new THREE.SphereGeometry( this, radius, 32, 32);
+    var material2 = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+    var ennemyMesh = new THREE.Mesh(geometry, material2);
+    ennemyMesh.position.copy(Vector3PositionPlayer);
+    ennemyMesh.position.z += THREE.Math.randInt(10, 100);
+    ennemyMesh.position.x += (THREE.Math.randInt(0, 1)*2-1)*10;
+    Game.scene.add( ennemyMesh );
 }
 
 Game.calculatePath = function()
