@@ -24,7 +24,7 @@ Game.init = function () {
 
     Game.createTerrain();
 
-    Game.PlayerSpeed = 90;
+    Game.PlayerSpeed = 40;
 
     Game.path = Game.calculatePath();
     Game.nextCheckpoint = 0;
@@ -143,8 +143,6 @@ Game.spawnEnnemy = function()
     var material2 = new THREE.MeshPhongMaterial( { color: 0xffff00 } );
     var ennemyMesh = new THREE.Mesh(geometry, material2);
 
-
-
     // if(Game.camera.position.distanceTo(Game.path[Game.nextCheckpoint]) < translateDistance)
 
    // ennemyMesh.position.copy(Vector3PositionPlayer);
@@ -161,19 +159,33 @@ Game.spawnEnnemy = function()
 Game.calculatePath = function()
 {
     var path = [];
-    var checkpoints = 64;
-    var radius = 400;
+    var checkpoints = 16;
+    var radius = 250;
     var angle = 2*Math.PI/checkpoints;
 
     for(var i=0; i<checkpoints; i++)
     {
-        path.push(new THREE.Vector3( Math.cos(angle*i)*radius, 2, Math.sin(angle*i)*radius ));
+        path.push(new THREE.Vector3( -Math.cos(angle*i)*radius+radius, 2, Math.sin(angle*i)*radius ));
     }
 
-    // for(var i=0; i<checkpoints; i++)
-    //     path.push(new THREE.Vector3( 0, 2, 128*i ));
+    for(var i=0; i<checkpoints; i++)
+    {
+        path.push(new THREE.Vector3( Math.cos(angle*i)*radius-radius, 2, Math.sin(angle*i)*radius ));
+    }
 
-    return path;
+    var spline = new THREE.Spline(path);
+    spline.reparametrizeByArcLength ( 6000 );
+
+    var smoothedPath = [];
+
+    splineArray = spline.getControlPointsArray();
+
+    for(var i=0; i<splineArray.length; i++)
+    {
+        smoothedPath.push(new THREE.Vector3(splineArray[i][0],splineArray[i][1],splineArray[i][2]));
+    }
+
+    return smoothedPath;
 }
 
 Game.add_elements = function ()
@@ -356,4 +368,5 @@ Game.init();
 
 // Game.scene.add(textMesh);
 
-setTimeout(Game.animate,1000);
+Game.animate();
+//setTimeout(Game.animate,1000);
