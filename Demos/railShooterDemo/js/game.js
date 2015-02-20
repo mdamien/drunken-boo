@@ -24,7 +24,7 @@ Game.init = function () {
 
     Game.createTerrain();
 
-    Game.PlayerSpeed = 2;
+    Game.PlayerSpeed = 20;
 
     Game.path = Game.calculatePath();
     Game.nextCheckpoint = 0;
@@ -267,21 +267,25 @@ Game.update = function (dt)
     // then increment checkpoint
     var translateDistance = Game.PlayerSpeed*dt;
 
-    while(Game.camera.position.distanceTo(Game.path[Game.nextCheckpoint]) > translateDistance)
-
-    if(Game.camera.position.distanceTo(Game.path[Game.nextCheckpoint]) < translateDistance)
+    var distanceToNextCheckpoint = Game.camera.position.distanceTo(Game.path[Game.nextCheckpoint]);
+    while(distanceToNextCheckpoint < translateDistance)
     {
+        translateDistance -= distanceToNextCheckpoint;
+        Game.camera.position.copy(Game.path[Game.nextCheckpoint]);
+
         if(Game.nextCheckpoint < Game.path.length-1)
             Game.nextCheckpoint++;
         else
             Game.nextCheckpoint=0;
 
-        // substract position vector of the camera from position vector of the checkpoint to get translation vector
-       // console.log(Game.nextCheckpoint);
-
-        Game.camera.lookAt(Game.path[Game.nextCheckpoint]);
-       // console.log(Game.camera.rotation);
+        var distanceToNextCheckpoint = Game.camera.position.distanceTo(Game.path[Game.nextCheckpoint]);
     }
+
+
+   // console.log(Game.nextCheckpoint);
+
+    Game.camera.lookAt(Game.path[Game.nextCheckpoint]);
+   // console.log(Game.camera.rotation);
 
     Game.camera.translateZ(-translateDistance);
 
