@@ -27,9 +27,9 @@ Game.init = function () {
     Game.PlayerSpeed = 2;
 
     Game.path = Game.calculatePath();
-    Game.currentCheckpoint = 0;
+    Game.nextCheckpoint = 0;
 
-    Game.camera.position.copy(Game.path[Game.currentCheckpoint]);
+    Game.camera.position.copy(Game.path[Game.nextCheckpoint]);
 
     Game.TimeBetweenEnnemies = 2;
 
@@ -145,7 +145,7 @@ Game.spawnEnnemy = function()
 
 
 
-    // if(Game.camera.position.distanceTo(Game.path[Game.currentCheckpoint]) < translateDistance)
+    // if(Game.camera.position.distanceTo(Game.path[Game.nextCheckpoint]) < translateDistance)
 
    // ennemyMesh.position.copy(Vector3PositionPlayer);
     ennemyMesh.position.z += THREE.Math.randInt(50, 100);
@@ -267,17 +267,19 @@ Game.update = function (dt)
     // then increment checkpoint
     var translateDistance = Game.PlayerSpeed*dt;
 
-    if(Game.camera.position.distanceTo(Game.path[Game.currentCheckpoint]) < translateDistance)
+    while(Game.camera.position.distanceTo(Game.path[Game.nextCheckpoint]) > translateDistance)
+
+    if(Game.camera.position.distanceTo(Game.path[Game.nextCheckpoint]) < translateDistance)
     {
-        if(Game.currentCheckpoint < Game.path.length-1)
-            Game.currentCheckpoint++;
+        if(Game.nextCheckpoint < Game.path.length-1)
+            Game.nextCheckpoint++;
         else
-            Game.currentCheckpoint=0;
+            Game.nextCheckpoint=0;
 
         // substract position vector of the camera from position vector of the checkpoint to get translation vector
-       // console.log(Game.currentCheckpoint);
+       // console.log(Game.nextCheckpoint);
 
-        Game.camera.lookAt(Game.path[Game.currentCheckpoint]);
+        Game.camera.lookAt(Game.path[Game.nextCheckpoint]);
        // console.log(Game.camera.rotation);
     }
 
