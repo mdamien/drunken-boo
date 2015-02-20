@@ -1,8 +1,18 @@
+/**
+This demo is inspired to another one --> link.
+
+The main goal of this demo is to give you a minimal code to make an app for both desktop 
+and cardboard VR (combined with an smartphone of course)
+**/
+
+
 window.Game = window.Game || {};
+
 
 Game.init = function () {
     Game.clock = new THREE.Clock();
-    Game.isdisplayedOn3D = true;
+    // boolean variable to choose the desktop/carboard Mode
+    Game.isCardboardViewport = true;
 
     Game.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 
@@ -10,7 +20,7 @@ Game.init = function () {
     Game.container = document.getElementById('example');
     Game.container.appendChild(Game.element);
 
-    //instanciate a new stereoEffect even if it's not used afterward
+    // the Strereoscopical transformation 
     Game.effect = new THREE.StereoEffect(Game.renderer);
     Game.scene = new THREE.Scene();
 
@@ -19,7 +29,7 @@ Game.init = function () {
     Game.scene.add(Game.camera);
 
     Game.controls;
-    if(Game.isdisplayedOn3D){
+    if(Game.isCardboardViewport){
         Game.controls = new THREE.OrbitControls(Game.camera, Game.element);
         Game.controls.rotateUp(Math.PI / 4);
         Game.controls.target.set(
@@ -109,41 +119,8 @@ Game.add_elements = function ()
     Game.scene.add( dirLight );
 
     dirLight.color.setHSL( 0.1, 0.7, 0.5 );
-
-    /*Game.textureFlare0 = THREE.ImageUtils.loadTexture( "textures/lensflare0.png" );
-    Game.textureFlare2 = THREE.ImageUtils.loadTexture( "textures/lensflare2.png" );
-    Game.textureFlare3 = THREE.ImageUtils.loadTexture( "textures/lensflare3.png" );
-
-    this.addLight( 0.55, 0.9, 0.5, 5000, 0, -1000 );
-    this.addLight( 0.08, 0.8, 0.5,    0, 0, -1000 );
-    this.addLight( 0.995, 0.5, 0.9, 5000, 5000, -1000 );*/
 }
 
-Game.addLight = function ( h, s, l, x, y, z ) {
-    var light = new THREE.PointLight( 0xffffff, 1.5, 4500 );
-    light.color.setHSL( h, s, l );
-    light.position.set( x, y, z );
-    Game.scene.add( light );
-
-    var flareColor = new THREE.Color( 0xffffff );
-    flareColor.setHSL( h, s, l + 0.5 );
-
-    var lensFlare = new THREE.LensFlare( Game.textureFlare0, 700, 0.0, THREE.AdditiveBlending, flareColor );
-
-    lensFlare.add( Game.textureFlare2, 512, 0.0, THREE.AdditiveBlending );
-    lensFlare.add( Game.textureFlare2, 512, 0.0, THREE.AdditiveBlending );
-    lensFlare.add( Game.textureFlare2, 512, 0.0, THREE.AdditiveBlending );
-
-    lensFlare.add( Game.textureFlare3, 60, 0.6, THREE.AdditiveBlending );
-    lensFlare.add( Game.textureFlare3, 70, 0.7, THREE.AdditiveBlending );
-    lensFlare.add( Game.textureFlare3, 120, 0.9, THREE.AdditiveBlending );
-    lensFlare.add( Game.textureFlare3, 70, 1.0, THREE.AdditiveBlending );
-
-    lensFlare.customUpdateCallback = Game.lensFlareUpdateCallback;
-    lensFlare.position.copy( light.position );
-
-    Game.scene.add( lensFlare );
-}
 
 Game.resize = function ()
 {
@@ -154,7 +131,7 @@ Game.resize = function ()
 	Game.camera.updateProjectionMatrix();
 
 	Game.renderer.setSize(width, height);
-    if(Game.isdisplayedOn3D) {
+    if(Game.isCardboardViewport) {
 	   Game.effect.setSize(width, height);
     }
 }
@@ -166,16 +143,12 @@ Game.update = function (dt)
 
     Game.camera.updateProjectionMatrix();
 
-    if(Game.isdisplayedOn3D) {
+    if(Game.isCardboardViewport) {
         Game.controls.update(dt);
     }
     else {
         Game.controls.update(dt);
     }
-
-
-
-    //Game.camera.position.x += dt*100;
 }
 
 Game.onWindowResize = function( event ) {
@@ -186,7 +159,7 @@ Game.onWindowResize = function( event ) {
     Game.camera.updateProjectionMatrix();
 
     Game.renderer.setSize(width, height);
-    if(Game.isdisplayedOn3D) {
+    if(Game.isCardboardViewport) {
         Game.effect.setSize(width, height);
     }
 }
@@ -201,7 +174,7 @@ Game.animate = function() {
 }
 
 Game.render = function () {
-    if (Game.isdisplayedOn3D) {
+    if (Game.isCardboardViewport) {
         Game.effect.render(Game.scene, Game.camera);
     }
     else
