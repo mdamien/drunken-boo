@@ -24,7 +24,7 @@ Game.init = function () {
 
     Game.createTerrain();
 
-    Game.PlayerSpeed = 20;
+    Game.PlayerSpeed = 90;
 
     Game.path = Game.calculatePath();
     Game.nextCheckpoint = 0;
@@ -161,8 +161,8 @@ Game.spawnEnnemy = function()
 Game.calculatePath = function()
 {
     var path = [];
-    var checkpoints = 512;
-    var radius = 100;
+    var checkpoints = 64;
+    var radius = 400;
     var angle = 2*Math.PI/checkpoints;
 
     for(var i=0; i<checkpoints; i++)
@@ -348,4 +348,12 @@ Game.fullscreen = function () {
 
 //start the game
 Game.init();
-Game.animate();
+// var textGeometry = new THREE.TextGeometry("RailShooter \n by \n ...");
+// var textMaterial = new THREE.MeshPhongMaterial( { ambient: '#'+Math.floor(Math.random()*16777215).toString(16)
+// , color: 0xffffff, specular: 0xffffff, shininess: 50 } );
+
+// var textMesh = new THREE.Mesh(textGeometry, textMaterial);
+
+// Game.scene.add(textMesh);
+
+setTimeout(Game.animate,1000);
