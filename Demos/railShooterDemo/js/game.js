@@ -118,7 +118,7 @@ Game.createTerrain = function()
 var geometry = new THREE.SphereGeometry( 5, 32, 32);
 var material2 = new THREE.MeshBasicMaterial( { color: 0xffffff } );
 
-
+// Beautiful sky from Gomez *\0/*
   for ( var i = 0; i < 1000; i ++ ) {
 
     sphere = new THREE.Mesh( geometry, material2);
@@ -138,10 +138,10 @@ var material2 = new THREE.MeshBasicMaterial( { color: 0xffffff } );
 Game.calculatePath = function()
 {
     var path = [];
-    var checkpoints = 3;
+    var checkpoints = 4;
 
     for(var i=0; i<checkpoints; i++)
-        path.push(new THREE.Vector3( 0, 2, 256*i ));
+        path.push(new THREE.Vector3( 0, 2, 128*i ));
 
     return path;
 }
@@ -227,10 +227,7 @@ Game.update = function (dt)
 
     // if distance to the next checkpoint is shorter than distance to travel this tick 
     // then increment checkpoint
-
     var translateDistance = Game.PlayerSpeed*dt;
-
-    Game.update.vectorMove = Game.update.vectorMove || new THREE.Vector3;
 
     if(Game.camera.position.distanceTo(Game.path[Game.currentCheckpoint]) < translateDistance)
     {
@@ -239,16 +236,13 @@ Game.update = function (dt)
         else
             Game.currentCheckpoint=0;
 
-        Game.update.vectorMove.subVectors(Game.path[Game.currentCheckpoint],Game.camera.position);
         // substract position vector of the camera from position vector of the checkpoint to get translation vector
-        //console.log(Game.update.vectorMove);
+       // console.log(Game.currentCheckpoint);
 
         Game.camera.lookAt(Game.path[Game.currentCheckpoint]);
        // console.log(Game.camera.rotation);
     }
 
-
-    //Game.camera.translateOnAxis(Game.update.vectorMove.normalize(), translateDistance);
     Game.camera.translateZ(-translateDistance);
 
 /*    if(Game.isdisplayedOn3D) {
