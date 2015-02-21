@@ -22,16 +22,7 @@ Game.init = function () {
     Game.renderer.shadowMapEnabled = true;
     Game.renderer.shadowMapSoft = true;
 
-    Game.createTerrain();
-
-    Game.PlayerSpeed = 40;
-
-    Game.path = Game.calculatePath();
-    Game.nextCheckpoint = 0;
-
-    Game.camera.position.copy(Game.path[Game.nextCheckpoint]);
-
-    Game.TimeBetweenEnnemies = 2;
+    Game.createWorld();
 
     // console.log(Game.camera.position);
 
@@ -82,12 +73,30 @@ Game.init = function () {
       setTimeout(Game.resize, 1);   
 }
 
-Game.createTerrain = function()
+Game.createWorld = function()
+{
+    Game.PlayerSpeed = 30;
+
+    var PathCollisionsSpheres = [];
+
+    Game.path = Game.calculatePath(PathCollisionsSpheres);
+    Game.nextCheckpoint = 0;
+
+    // console.log(Game.path);
+
+    Game.camera.position.copy(Game.path[Game.nextCheckpoint]);
+
+    Game.TimeBetweenEnnemies = 2;
+
+    Game.createTerrain(PathCollisionsSpheres);
+}
+
+Game.createTerrain = function(PathCollisionsSpheres)
 {
     var terrainWidth = 1024;
     var boxWidth = 5;
     var boxHeight = 20;
-    var density = 0.3;
+    var density = 1; // %
     var planeGeometry = new THREE.PlaneGeometry(terrainWidth, terrainWidth);
     var material = new THREE.MeshPhongMaterial( { ambient: 0x333333, color: 0xffffff, specular: 0xffffff, shininess: 50 } );
 
@@ -97,6 +106,13 @@ Game.createTerrain = function()
 
     terrainMesh.rotation.x = THREE.Math.degToRad(-90);
     terrainMesh.updateMatrix();
+
+    for(var i=0 ; i<PathCollisionsSpheres.length; i++)
+    {
+        var center = new THREE.Vector3().copy(PathCollisionsSpheres[i].center);
+        center.y = boxHeight/2;
+        PathCollisionsSpheres[i].set(center, PathCollisionsSpheres[i].radius);
+    }
 
     for(var i=0; i<terrainWidth*terrainWidth*density/(100*boxWidth*boxWidth); i++)
     {
@@ -109,12 +125,25 @@ Game.createTerrain = function()
         boxMesh.position.x = terrainWidth/2 * ( 2.0 * Math.random() - 1.0 );
         boxMesh.position.y = boxHeight/2;
         boxMesh.position.z = terrainWidth/2 * ( 2.0 * Math.random() - 1.0 );
-        boxMesh.castShadow = true;
 
         boxMesh.updateMatrix();
 
-        boxMesh.matrixAutoUpdate = false;
-        Game.scene.add( boxMesh );
+        var onPath = false;
+
+        //console.log(PathCollisionsSpheres.length);
+
+        for(var j=0; j<PathCollisionsSpheres.length && !onPath; j++)
+        {
+            if(PathCollisionsSpheres[j].containsPoint(boxMesh.position))
+                onPath=true;
+        }
+
+        if(!onPath)
+        {
+            boxMesh.castShadow = true;
+            boxMesh.matrixAutoUpdate = false;
+            Game.scene.add( boxMesh );
+        }
     }
 
 var geometry = new THREE.SphereGeometry( 5, 32, 32);
@@ -156,7 +185,7 @@ Game.spawnEnnemy = function()
     return ennemyMesh.position; // For Debugging purpose
 }
 
-Game.calculatePath = function()
+Game.calculatePath = function( collisionsSpheres )
 {
     var path = [];
     var checkpoints = 16;
@@ -177,13 +206,29 @@ Game.calculatePath = function()
     spline.reparametrizeByArcLength ( 6000 );
 
     var smoothedPath = [];
+    // console.log(spline.getControlPointsArray());
 
     splineArray = spline.getControlPointsArray();
 
-    for(var i=0; i<splineArray.length; i++)
+    var collisionSphereRadius = 16;
+    var distanceFromLast=0;
+
+    smoothedPath.push(new THREE.Vector3(splineArray[0][0],splineArray[0][1],splineArray[0][2]));
+    collisionsSpheres.push(new THREE.Sphere(new THREE.Vector3().copy(smoothedPath[0]), collisionSphereRadius));
+    for(var i=1; i<splineArray.length; i++)
     {
         smoothedPath.push(new THREE.Vector3(splineArray[i][0],splineArray[i][1],splineArray[i][2]));
+
+
+        distanceFromLast += smoothedPath[smoothedPath.length-1].distanceTo(smoothedPath[smoothedPath.length-2]);
+        if(distanceFromLast > collisionSphereRadius)
+        {
+            collisionsSpheres.push(new THREE.Sphere(new THREE.Vector3().copy(smoothedPath[smoothedPath.length-1]), collisionSphereRadius));
+            distanceFromLast=0;
+        }
     }
+
+    //console.log(smoothedPath[0]);
 
     return smoothedPath;
 }
