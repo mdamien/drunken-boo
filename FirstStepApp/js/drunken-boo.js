@@ -1,5 +1,5 @@
 /**
-This demo is inspired to another one --> link.
+TODO : have to clean to make the scene simplier
 
 The main goal of this demo is to give you a minimal code to make an app for both desktop 
 and cardboard VR (combined with an smartphone of course)
@@ -74,11 +74,12 @@ Game.init = function () {
 
 Game.add_elements = function ()
 {
+  // two lights
   var ambient = new THREE.AmbientLight( 0xffffff );
   ambient.color.setHSL( 0.1, 0.3, 0.2 );
   Game.scene.add( ambient );
 
-
+  // the second one
   var dirLight = new THREE.DirectionalLight( 0xffffff, 0.125 );
   dirLight.position.set( 0, -1, 0 ).normalize();
   Game.scene.add( dirLight );
@@ -86,7 +87,6 @@ Game.add_elements = function ()
   dirLight.color.setHSL( 0.1, 0.7, 0.5 );
 
   var s = 250;
-
   var cube = new THREE.BoxGeometry( s, s, s );
   var material = new THREE.MeshPhongMaterial( { ambient: 0x333333, color: 0xffffff, specular: 0xffffff, shininess: 50 } );
 
@@ -164,8 +164,6 @@ Game.onWindowResize = function( event ) {
     }
 }
 
-//
-
 Game.animate = function() {
  	requestAnimationFrame(Game.animate);
       Game.update(Game.clock.getDelta());
@@ -176,9 +174,8 @@ Game.animate = function() {
 Game.render = function () {
     if (Game.isCardboardViewport) {
         Game.effect.render(Game.scene, Game.camera);
-    }
-    else
-    {
+    } 
+    else {
         Game.renderer.render(Game.scene, Game.camera);
     }
 }
