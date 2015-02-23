@@ -72,7 +72,7 @@ Game.init = function () {
     if (!e.alpha) {
       return;
     }
-        Game.controls = new THREE.DeviceOrientationControls(Game.camera, Game.container.domElement );
+        Game.controls = new THREE.DeviceOrientationControls(Game.camera, Game.container.domElement);
         Game.controls.connect();
         Game.controls.update();
 
