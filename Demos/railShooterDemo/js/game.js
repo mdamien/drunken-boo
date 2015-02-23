@@ -3,6 +3,8 @@ window.Game = window.Game || {};
 Game.init = function () {
     Game.clock = new THREE.Clock();
     Game.isdisplayedOn3D = false;
+    Game.mouse = new THREE.Vector2();
+    Game.raycaster = new THREE.Raycaster();
 
     Game.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 
@@ -50,7 +52,10 @@ Game.init = function () {
         Game.controls.autoForward = false;
         Game.controls.dragToLook = false
     }
+
 */
+    //should be upper in the else
+    window.addEventListener('mousemove', onMouseMove, false);
     function setOrientationControls(e) {
     if (!e.alpha) {
       return;
@@ -66,9 +71,7 @@ Game.init = function () {
       }
       window.addEventListener('deviceorientation', setOrientationControls, true);
 
-      //demo taken from the threeJs repository
       Game.add_elements();
-
       window.addEventListener('resize', Game.resize, false);
       setTimeout(Game.resize, 1);   
 }
@@ -214,9 +217,9 @@ Game.createWorld = function()
 
 Game.spawnEnnemy = function()
 {
-    console.log("SpawnEnemy");
     // only for the test, i chose to create Enemy linked to the camera
-    // the vec is the vector from the camera where the object will be. 
+    // the vec is the vector representing where the object will be.
+    // in the future the enemy should be added in scene of course !
     var vec = new THREE.Vector3( 0, 0, 20 );
     vec.applyQuaternion ( Game.camera.quaternion );
     //console.log( Game.camera.quaternion);
@@ -224,6 +227,27 @@ Game.spawnEnnemy = function()
     Game.camera.add( ennemyMesh );
 
     return ennemyMesh.position; // For Debugging purpose
+}
+
+function onMouseMove( event )
+{
+    event.preventDefault();
+    // calculate mouse position in normalized device coordinates
+    // (-1 to +1) for both components
+    Game.mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+    Game.mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+}
+
+Game.shoot = function ()
+{
+    //@see SpawnEnemy the raycast should be test between camera and game.scene
+    Game.raycaster.setFromCamera( Game.mouse, Game.camera );
+    // calculate objects intersecting the picking ray
+    var intersects = Game.raycaster.intersectObjects( Game.camera.children, true );
+
+    if( intersects.length > 0) {
+        Game.camera.remove( intersects[ 0 ].object );
+    }
 }
 
 Game.add_elements = function ()
@@ -302,16 +326,14 @@ Game.resize = function ()
 Game.update = function (dt) 
 {
     Game.update.lastEnnemySpawn = Game.update.lastEnnemySpawn || 0;
-
     if(Game.clock.getElapsedTime () - Game.update.lastEnnemySpawn > Game.TimeBetweenEnnemies)
     {
         //console.log(Game.spawnEnnemy());
         //Game.spawnEnnemy();
         Game.update.lastEnnemySpawn = Game.clock.getElapsedTime ();
     }
-
     Game.resize();
-
+    Game.shoot();
     Game.camera.updateProjectionMatrix();
 
     // if distance to the next checkpoint is shorter than distance to travel this tick 
@@ -396,7 +418,6 @@ Game.fullscreen = function () {
   }
 }
 
-
 //start the game
 Game.init();
 // var textGeometry = new THREE.TextGeometry("RailShooter \n by \n ...");
@@ -408,4 +429,3 @@ Game.init();
 // Game.scene.add(textMesh);
 
 Game.animate();
-//setTimeout(Game.animate,1000);
