@@ -146,8 +146,6 @@ Game.createWorld = function()
         terrainMesh.matrixAutoUpdate = false;
 
         Game.scene.add( terrainMesh );
-
-        // console.log("terrain");
     }
 
     this.calculatePath = function( collisionsSpheres )
@@ -199,7 +197,7 @@ Game.createWorld = function()
     }
 
     Game.PlayerSpeed = 30;
-
+    
     var PathCollisionsSpheres = [];
 
     Game.path = this.calculatePath(PathCollisionsSpheres);
@@ -216,19 +214,14 @@ Game.createWorld = function()
 
 Game.spawnEnnemy = function()
 {
-    var geometry = new THREE.SphereGeometry(2);
-    var material2 = new THREE.MeshPhongMaterial( { color: 0xffff00 } );
-    var ennemyMesh = new THREE.Mesh(geometry, material2);
-
-    // if(Game.camera.position.distanceTo(Game.path[Game.nextCheckpoint]) < translateDistance)
-
-   // ennemyMesh.position.copy(Vector3PositionPlayer);
-    ennemyMesh.position.z += THREE.Math.randInt(50, 100);
-    // ennemyMesh.position.x += (THREE.Math.randInt(0, 1)*2-1)*10;
-    ennemyMesh.position.x += (THREE.Math.randInt(0, 2)*2-1)*10;
-    ennemyMesh.castShadow = true;
-    ennemyMesh.receiveShadow = true;
-    Game.scene.add( ennemyMesh );
+    console.log("SpawnEnemy");
+    // only for the test, i chose to create Enemy linked to the camera
+    // the vec is the vector from the camera where the object will be. 
+    var vec = new THREE.Vector3( 0, 0, 20 );
+    vec.applyQuaternion ( Game.camera.quaternion );
+    //console.log( Game.camera.quaternion);
+    var ennemyMesh = new Enemy( vec );
+    Game.camera.add( ennemyMesh );
 
     return ennemyMesh.position; // For Debugging purpose
 }
@@ -313,6 +306,7 @@ Game.update = function (dt)
     if(Game.clock.getElapsedTime () - Game.update.lastEnnemySpawn > Game.TimeBetweenEnnemies)
     {
         //console.log(Game.spawnEnnemy());
+        //Game.spawnEnnemy();
         Game.update.lastEnnemySpawn = Game.clock.getElapsedTime ();
     }
 
