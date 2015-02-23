@@ -210,12 +210,12 @@ Game.createWorld = function()
 
     Game.camera.position.copy(Game.path[Game.nextCheckpoint]);
 
-    Game.TimeBetweenEnnemies = 2;
+    Game.TimeBetweenEnemies = 2;
 
     this.createTerrain(PathCollisionsSpheres);
 }
 
-Game.spawnEnnemy = function()
+Game.spawnEnemy = function()
 {
     // only for the test, i chose to create Enemy linked to the camera
     // the vec is the vector representing where the object will be.
@@ -223,10 +223,10 @@ Game.spawnEnnemy = function()
     var vec = new THREE.Vector3( 0, 0, 20 );
     vec.applyQuaternion ( Game.camera.quaternion );
     //console.log( Game.camera.quaternion);
-    var ennemyMesh = new Enemy( vec );
-    Game.camera.add( ennemyMesh );
+    var enemyMesh = new Enemy( vec );
+    Game.camera.add( enemyMesh );
 
-    return ennemyMesh.position; // For Debugging purpose
+    return enemyMesh.position; // For Debugging purpose
 }
 
 function onMouseMove( event )
@@ -325,12 +325,12 @@ Game.resize = function ()
 
 Game.update = function (dt) 
 {
-    Game.update.lastEnnemySpawn = Game.update.lastEnnemySpawn || 0;
-    if(Game.clock.getElapsedTime () - Game.update.lastEnnemySpawn > Game.TimeBetweenEnnemies)
+    Game.update.lastEnemySpawn = Game.update.lastEnemySpawn || 0;
+    if(Game.clock.getElapsedTime () - Game.update.lastEnemySpawn > Game.TimeBetweenEnemies)
     {
-        //console.log(Game.spawnEnnemy());
-        //Game.spawnEnnemy();
-        Game.update.lastEnnemySpawn = Game.clock.getElapsedTime ();
+        //console.log(Game.spawnEnemy());
+        //Game.spawnEnemy();
+        Game.update.lastEnemySpawn = Game.clock.getElapsedTime ();
     }
     Game.resize();
     Game.shoot();
