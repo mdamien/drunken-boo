@@ -3,6 +3,8 @@ window.Game = window.Game || {};
 Game.init = function () {
     Game.clock = new THREE.Clock();
     Game.isdisplayedOn3D = false;
+    Game.mouse = new THREE.Vector2();
+    Game.raycaster = new THREE.Raycaster();
 
     Game.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 
@@ -50,7 +52,10 @@ Game.init = function () {
         Game.controls.autoForward = false;
         Game.controls.dragToLook = false
     }
+
 */
+    //should be above in the else
+    window.addEventListener('mousemove', onMouseMove, false);
     function setOrientationControls(e) {
     if (!e.alpha) {
       return;
@@ -66,9 +71,7 @@ Game.init = function () {
       }
       window.addEventListener('deviceorientation', setOrientationControls, true);
 
-      //demo taken from the threeJs repository
       Game.add_elements();
-
       window.addEventListener('resize', Game.resize, false);
       setTimeout(Game.resize, 1);   
 }
@@ -146,8 +149,6 @@ Game.createWorld = function()
         terrainMesh.matrixAutoUpdate = false;
 
         Game.scene.add( terrainMesh );
-
-        // console.log("terrain");
     }
 
     this.calculatePath = function( collisionsSpheres )
@@ -199,7 +200,7 @@ Game.createWorld = function()
     }
 
     Game.PlayerSpeed = 30;
-
+    
     var PathCollisionsSpheres = [];
 
     Game.path = this.calculatePath(PathCollisionsSpheres);
@@ -209,28 +210,43 @@ Game.createWorld = function()
 
     Game.camera.position.copy(Game.path[Game.nextCheckpoint]);
 
-    Game.TimeBetweenEnnemies = 2;
+    Game.TimeBetweenEnemies = 2;
 
     this.createTerrain(PathCollisionsSpheres);
 }
 
-Game.spawnEnnemy = function()
+Game.spawnEnemy = function()
 {
-    var geometry = new THREE.SphereGeometry(2);
-    var material2 = new THREE.MeshPhongMaterial( { color: 0xffff00 } );
-    var ennemyMesh = new THREE.Mesh(geometry, material2);
+    // only for the test, i chose to create Enemy linked to the camera
+    // the vecFront is the vector representing where the object will be.
+    // in the future the enemy should be added in scene of course !
+    var vecFront = new THREE.Vector3( 0, 0, 20 );
+    vecFront.applyQuaternion ( Game.camera.quaternion );
+    //console.log( Game.camera.quaternion);
+    var enemyMesh = new Enemy( vecFront );
+    Game.camera.add( enemyMesh );
 
-    // if(Game.camera.position.distanceTo(Game.path[Game.nextCheckpoint]) < translateDistance)
+    return enemyMesh.position; // For Debugging purpose
+}
 
-   // ennemyMesh.position.copy(Vector3PositionPlayer);
-    ennemyMesh.position.z += THREE.Math.randInt(50, 100);
-    // ennemyMesh.position.x += (THREE.Math.randInt(0, 1)*2-1)*10;
-    ennemyMesh.position.x += (THREE.Math.randInt(0, 2)*2-1)*10;
-    ennemyMesh.castShadow = true;
-    ennemyMesh.receiveShadow = true;
-    Game.scene.add( ennemyMesh );
+function onMouseMove( event )
+{
+    event.preventDefault();
+    // calculate mouse position in normalized device coordinates
+    // (-1 to +1) for both components
+    Game.mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+    Game.mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+}
 
-    return ennemyMesh.position; // For Debugging purpose
+Game.shoot = function ()
+{
+    //@see SpawnEnemy the raycast should be tested between camera and game.scene
+    Game.raycaster.setFromCamera( Game.mouse, Game.camera );
+    // calculate objects intersecting the picking ray
+    var intersects = Game.raycaster.intersectObjects( Game.scene.children, true);
+    if( intersects.length > 0) {
+       Game.scene.remove( intersects[ 0 ].object )
+    }
 }
 
 Game.add_elements = function ()
@@ -308,16 +324,15 @@ Game.resize = function ()
 
 Game.update = function (dt) 
 {
-    Game.update.lastEnnemySpawn = Game.update.lastEnnemySpawn || 0;
-
-    if(Game.clock.getElapsedTime () - Game.update.lastEnnemySpawn > Game.TimeBetweenEnnemies)
+    Game.update.lastEnemySpawn = Game.update.lastEnemySpawn || 0;
+    if(Game.clock.getElapsedTime () - Game.update.lastEnemySpawn > Game.TimeBetweenEnemies)
     {
-        //console.log(Game.spawnEnnemy());
-        Game.update.lastEnnemySpawn = Game.clock.getElapsedTime ();
+        //console.log(Game.spawnEnemy());
+        //Game.spawnEnemy();
+        Game.update.lastEnemySpawn = Game.clock.getElapsedTime ();
     }
-
     Game.resize();
-
+    Game.shoot();
     Game.camera.updateProjectionMatrix();
 
     // if distance to the next checkpoint is shorter than distance to travel this tick 
@@ -402,7 +417,6 @@ Game.fullscreen = function () {
   }
 }
 
-
 //start the game
 Game.init();
 // var textGeometry = new THREE.TextGeometry("RailShooter \n by \n ...");
@@ -414,4 +428,3 @@ Game.init();
 // Game.scene.add(textMesh);
 
 Game.animate();
-//setTimeout(Game.animate,1000);
