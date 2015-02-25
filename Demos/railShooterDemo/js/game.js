@@ -54,7 +54,7 @@ Game.init = function () {
     }
 
 */
-    //should be upper in the else
+    //should be above in the else
     window.addEventListener('mousemove', onMouseMove, false);
     function setOrientationControls(e) {
     if (!e.alpha) {
@@ -218,12 +218,12 @@ Game.createWorld = function()
 Game.spawnEnemy = function()
 {
     // only for the test, i chose to create Enemy linked to the camera
-    // the vec is the vector representing where the object will be.
+    // the vecFront is the vector representing where the object will be.
     // in the future the enemy should be added in scene of course !
-    var vec = new THREE.Vector3( 0, 0, 20 );
-    vec.applyQuaternion ( Game.camera.quaternion );
+    var vecFront = new THREE.Vector3( 0, 0, 20 );
+    vecFront.applyQuaternion ( Game.camera.quaternion );
     //console.log( Game.camera.quaternion);
-    var enemyMesh = new Enemy( vec );
+    var enemyMesh = new Enemy( vecFront );
     Game.camera.add( enemyMesh );
 
     return enemyMesh.position; // For Debugging purpose
@@ -240,13 +240,12 @@ function onMouseMove( event )
 
 Game.shoot = function ()
 {
-    //@see SpawnEnemy the raycast should be test between camera and game.scene
+    //@see SpawnEnemy the raycast should be tested between camera and game.scene
     Game.raycaster.setFromCamera( Game.mouse, Game.camera );
     // calculate objects intersecting the picking ray
-    var intersects = Game.raycaster.intersectObjects( Game.camera.children, true );
-
+    var intersects = Game.raycaster.intersectObjects( Game.scene.children, true);
     if( intersects.length > 0) {
-        Game.camera.remove( intersects[ 0 ].object );
+       Game.scene.remove( intersects[ 0 ].object )
     }
 }
 
