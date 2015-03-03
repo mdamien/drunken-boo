@@ -325,7 +325,10 @@ Game.resize = function ()
 
 Game.spawnEnemy = function()
 {
-    var enemySpawnPosition = new THREE.Vector3().copy(Game.path[Game.nextCheckpoint+300]);
+    var enemyDistance = 400;
+    var enemyCheckpointSpawn = (Game.nextCheckpoint+enemyDistance) % Game.path.length;
+
+    var enemySpawnPosition = new THREE.Vector3().copy(Game.path[enemyCheckpointSpawn]);
     var enemyMesh = new Enemy( enemySpawnPosition );
     Game.scene.add( enemyMesh );
 
