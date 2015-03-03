@@ -26,6 +26,8 @@ Game.init = function () {
 
     Game.createWorld();
 
+    Game.PlayerSpeed = 30;
+
     // console.log(Game.camera.position);
 
     // for(var i=0; i<Game.path.length; i++)
@@ -198,8 +200,6 @@ Game.createWorld = function()
 
         return smoothedPath;
     }
-
-    Game.PlayerSpeed = 30;
     
     var PathCollisionsSpheres = [];
 
