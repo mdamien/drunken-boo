@@ -215,7 +215,8 @@ Game.createWorld = function()
     this.createTerrain(PathCollisionsSpheres);
 }
 
-Game.spawnEnemy = function()
+/********************** Gomez Test **********************/
+/*Game.spawnEnemy = function()
 {
     // only for the test, i chose to create Enemy linked to the camera
     // the vecFront is the vector representing where the object will be.
@@ -227,7 +228,8 @@ Game.spawnEnemy = function()
     Game.camera.add( enemyMesh );
 
     return enemyMesh.position; // For Debugging purpose
-}
+}*/
+/********************** Gomez Test **********************/
 
 function onMouseMove( event )
 {
@@ -321,6 +323,14 @@ Game.resize = function ()
     }
 }
 
+Game.spawnEnemy = function()
+{
+    var enemySpawnPosition = new THREE.Vector3().copy(Game.path[Game.nextCheckpoint+300]);
+    var enemyMesh = new Enemy( enemySpawnPosition );
+    Game.scene.add( enemyMesh );
+
+    return enemyMesh.position; // For Debugging purpose
+}
 
 Game.update = function (dt) 
 {
@@ -328,7 +338,7 @@ Game.update = function (dt)
     if(Game.clock.getElapsedTime () - Game.update.lastEnemySpawn > Game.TimeBetweenEnemies)
     {
         //console.log(Game.spawnEnemy());
-        //Game.spawnEnemy();
+        Game.spawnEnemy();
         Game.update.lastEnemySpawn = Game.clock.getElapsedTime ();
     }
     Game.resize();
