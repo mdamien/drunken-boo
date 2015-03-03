@@ -246,8 +246,13 @@ Game.shoot = function ()
     Game.raycaster.setFromCamera( Game.mouse, Game.camera );
     // calculate objects intersecting the picking ray
     var intersects = Game.raycaster.intersectObjects( Game.scene.children, true);
-    if( intersects.length > 0) {
-       Game.scene.remove( intersects[ 0 ].object )
+    if(intersects.length > 0) 
+    {
+        if(intersects[ 0 ].object.name=="Enemy")
+        {
+            console.log(intersects[ 0 ].object);
+            Game.scene.remove( intersects[ 0 ].object );
+        }
     }
 }
 
