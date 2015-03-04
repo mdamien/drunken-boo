@@ -28,7 +28,7 @@ Game.init = function () {
 
     Game.PlayerSpeed = 30;
 
-    Game.ennemiesIds = []; // Object3D.id's array
+    Game.enemies = []; // array of Enemies
 
     // console.log(Game.camera.position);
 
@@ -247,23 +247,20 @@ Game.shoot = function ()
     //@see SpawnEnemy the raycast should be tested between camera and game.scene
     Game.raycaster.setFromCamera( Game.mouse, Game.camera );
     // calculate objects intersecting the picking ray
-    var intersects = Game.raycaster.intersectObjects( Game.scene.children, true);
+    var intersects = Game.raycaster.intersectObjects( Game.enemies, true);
     if(intersects.length > 0) 
     {
-        if(intersects[ 0 ].object.name=="Enemy")
+        // console.log(intersects[ 0 ].object);
+        for(var i=0; i<Game.enemies.length; i++)
         {
-           // console.log(intersects[ 0 ].object);
-            for(var i=0; i<Game.ennemiesIds.length; i++)
+            if(Game.enemies[i].id==intersects[ 0 ].object.id)
             {
-                if(Game.ennemiesIds[i]==intersects[ 0 ].object.id)
-                {
-                    Game.ennemiesIds.splice(i,1);   // remove the id of the ennemy killed from the array;
-                    i=Game.ennemiesIds.length;
-                }
+                Game.enemies.splice(i,1);   // remove the id of the ennemy killed from the array;
+                i=Game.enemies.length;
             }
-
-            Game.scene.remove( intersects[ 0 ].object );
         }
+
+        Game.scene.remove( intersects[ 0 ].object );
     }
 }
 
@@ -347,8 +344,8 @@ Game.spawnEnemy = function()
     var enemySpawnPosition = new THREE.Vector3().copy(Game.path[enemyCheckpointSpawn]);
     var enemyMesh = new Enemy( enemySpawnPosition );
     Game.scene.add( enemyMesh );
-    Game.ennemiesIds.push(enemyMesh.id);
-    console.log(Game.ennemiesIds);
+    Game.enemies.push(enemyMesh);
+    console.log(Game.enemies);
     return enemyMesh.position; // For Debugging purpose
 }
 
