@@ -11,6 +11,7 @@ var Enemy = function (vector3Pos, geom, mate) {
 // static properties 
 Enemy.geometry = new THREE.SphereGeometry(2, 32, 32);
 Enemy.material = new THREE.MeshPhongMaterial( { color: 0xffff00 } );
+Enemy.crashedMaterial = new THREE.MeshPhongMaterial( { color: 0xff0000 } );
 Enemy.type = "Enemy";
 Enemy.name = "Enemy";
 

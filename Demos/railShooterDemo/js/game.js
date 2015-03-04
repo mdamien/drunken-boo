@@ -27,6 +27,7 @@ Game.init = function () {
     Game.createWorld();
 
     Game.PlayerSpeed = 30;
+    Game.DistanceEnemyCollision = 10;
 
     Game.enemies = []; // array of Enemies
 
@@ -247,7 +248,7 @@ Game.shoot = function ()
     //@see SpawnEnemy the raycast should be tested between camera and game.scene
     Game.raycaster.setFromCamera( Game.mouse, Game.camera );
     // calculate objects intersecting the picking ray
-    var intersects = Game.raycaster.intersectObjects( Game.enemies, true);
+    var intersects = Game.raycaster.intersectObjects( Game.enemies );
     if(intersects.length > 0) 
     {
         // console.log(intersects[ 0 ].object);
@@ -345,17 +346,67 @@ Game.spawnEnemy = function()
     var enemyMesh = new Enemy( enemySpawnPosition );
     Game.scene.add( enemyMesh );
     Game.enemies.push(enemyMesh);
-    console.log(Game.enemies);
+ //   console.log(Game.enemies);
     return enemyMesh.position; // For Debugging purpose
 }
 
 Game.movePlayer = function(dt)
 {
+    this.crashTest = function(Vector3from, Vector3to, distanceToCollision)
+    {
+        var raycaster = new THREE.Raycaster(Vector3from, new THREE.Vector3().subVectors( Vector3to , Vector3from ), 0, Vector3from.distanceTo(Vector3to));
+
+        var intersects = raycaster.intersectObject( Game.enemies[0] );
+        if(intersects.length > 0) 
+        {
+            if(distanceToCollision === undefined || intersects[ 0 ].object.distance<distanceToCollision)
+            {
+                console.log("FATALITY, You Are NOTHING !");
+                intersects[ 0 ].object.material = Enemy.crashedMaterial;
+
+              //  console.log(Game.camera.position.distanceTo(intersects[ 0 ].object.position));
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    if(Game.enemies.length > 0)
+    {
+        var distanceToCollision = Game.DistanceEnemyCollision;
+        var nextCollisionFrom = new THREE.Vector3().copy(Game.camera.position); // position as vector3
+        var nextCollisionCheckpointTo = Game.nextCheckpoint;    // checkpoint index
+
+        var distanceToNextCollisionsCheckpoint = nextCollisionFrom.distanceTo(Game.path[nextCollisionCheckpointTo]);
+
+        while(distanceToNextCollisionsCheckpoint < distanceToCollision)
+        {
+            if(this.crashTest(nextCollisionFrom, Game.path[nextCollisionCheckpointTo]))
+                distanceToCollision=0;
+
+            distanceToCollision-=distanceToNextCollisionsCheckpoint;
+
+            nextCollisionFrom = Game.path[nextCollisionCheckpointTo];
+
+            if(nextCollisionCheckpointTo < Game.path.length-1)
+                nextCollisionCheckpointTo = nextCollisionCheckpointTo+1;
+            else
+                nextCollisionCheckpointTo = 0;
+
+            distanceToNextCollisionsCheckpoint = nextCollisionFrom.distanceTo(Game.path[nextCollisionCheckpointTo]);
+        }
+
+        this.crashTest(nextCollisionFrom, Game.path[nextCollisionCheckpointTo], distanceToCollision);
+    }
+
     // if distance to the next checkpoint is shorter than distance to travel this tick 
     // then increment checkpoint
     var translateDistance = Game.PlayerSpeed*dt;
 
     var distanceToNextCheckpoint = Game.camera.position.distanceTo(Game.path[Game.nextCheckpoint]);
+
     while(distanceToNextCheckpoint < translateDistance)
     {
         translateDistance -= distanceToNextCheckpoint;
