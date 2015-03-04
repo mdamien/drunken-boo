@@ -28,6 +28,8 @@ Game.init = function () {
 
     Game.PlayerSpeed = 30;
 
+    Game.ennemiesIds = []; // Object3D.id's array
+
     // console.log(Game.camera.position);
 
     // for(var i=0; i<Game.path.length; i++)
@@ -250,7 +252,16 @@ Game.shoot = function ()
     {
         if(intersects[ 0 ].object.name=="Enemy")
         {
-            console.log(intersects[ 0 ].object);
+           // console.log(intersects[ 0 ].object);
+            for(var i=0; i<Game.ennemiesIds.length; i++)
+            {
+                if(Game.ennemiesIds[i]==intersects[ 0 ].object.id)
+                {
+                    Game.ennemiesIds.splice(i,1);   // remove the id of the ennemy killed from the array;
+                    i=Game.ennemiesIds.length;
+                }
+            }
+
             Game.scene.remove( intersects[ 0 ].object );
         }
     }
@@ -336,23 +347,13 @@ Game.spawnEnemy = function()
     var enemySpawnPosition = new THREE.Vector3().copy(Game.path[enemyCheckpointSpawn]);
     var enemyMesh = new Enemy( enemySpawnPosition );
     Game.scene.add( enemyMesh );
-
+    Game.ennemiesIds.push(enemyMesh.id);
+    console.log(Game.ennemiesIds);
     return enemyMesh.position; // For Debugging purpose
 }
 
-Game.update = function (dt) 
+Game.movePlayer = function(dt)
 {
-    Game.update.lastEnemySpawn = Game.update.lastEnemySpawn || 0;
-    if(Game.clock.getElapsedTime () - Game.update.lastEnemySpawn > Game.TimeBetweenEnemies)
-    {
-        //console.log(Game.spawnEnemy());
-        Game.spawnEnemy();
-        Game.update.lastEnemySpawn = Game.clock.getElapsedTime ();
-    }
-    Game.resize();
-    Game.shoot();
-    Game.camera.updateProjectionMatrix();
-
     // if distance to the next checkpoint is shorter than distance to travel this tick 
     // then increment checkpoint
     var translateDistance = Game.PlayerSpeed*dt;
@@ -371,13 +372,25 @@ Game.update = function (dt)
         var distanceToNextCheckpoint = Game.camera.position.distanceTo(Game.path[Game.nextCheckpoint]);
     }
 
-
-   // console.log(Game.nextCheckpoint);
-
     Game.camera.lookAt(Game.path[Game.nextCheckpoint]);
-   // console.log(Game.camera.rotation);
 
     Game.camera.translateZ(-translateDistance);
+}
+
+Game.update = function (dt) 
+{
+    Game.update.lastEnemySpawn = Game.update.lastEnemySpawn || 0;
+    if(Game.clock.getElapsedTime () - Game.update.lastEnemySpawn > Game.TimeBetweenEnemies)
+    {
+        //console.log(Game.spawnEnemy());
+        Game.spawnEnemy();
+        Game.update.lastEnemySpawn = Game.clock.getElapsedTime ();
+    }
+    Game.resize();
+    Game.shoot();
+    Game.camera.updateProjectionMatrix();
+
+    Game.movePlayer(dt);
 
 /*    if(Game.isdisplayedOn3D) {
         Game.controls.update(dt);
