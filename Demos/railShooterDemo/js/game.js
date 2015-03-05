@@ -1,6 +1,7 @@
 window.Game = window.Game || {};
 
 Game.init = function () {
+
     Game.clock = new THREE.Clock();
     Game.isdisplayedOn3D = false;
     Game.mouse = new THREE.Vector2();
@@ -16,7 +17,11 @@ Game.init = function () {
     Game.effect = new THREE.StereoEffect(Game.renderer);
     Game.scene = new THREE.Scene();
 
-    Game.camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 15000);
+    Game.camera;
+    if(Game.isdisplayedOn3D)
+        Game.camera = new THREE.PerspectiveCamera(90, 1, 0.001, 700);
+    else
+        Game.camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 15000);
     //Game.camera.rotation.y = THREE.Math.degToRad(0);
    // Game.camera.lookAt(new THREE.Vector3(0,0,0));
     Game.scene.add(Game.camera);
@@ -25,6 +30,13 @@ Game.init = function () {
     Game.renderer.shadowMapSoft = true;
 
     Game.createWorld();
+
+    Game.PlayerSpeed = 30;
+    Game.DistanceEnemyCollision = 10;
+
+    Game.TimeBetweenEnemies = 0.9;
+
+    Game.enemies = []; // array of Enemies
 
     // console.log(Game.camera.position);
 
@@ -83,7 +95,7 @@ Game.createWorld = function()
         var terrainWidth = 1024;
         var boxWidth = 5;
         var boxHeight = 20;
-        var density = 1; // %
+        var density = 0.2; // %
         var planeGeometry = new THREE.PlaneGeometry(terrainWidth, terrainWidth);
         var material = new THREE.MeshPhongMaterial( { ambient: 0x333333, color: 0xffffff, specular: 0xffffff, shininess: 50 } );
 
@@ -198,8 +210,6 @@ Game.createWorld = function()
 
         return smoothedPath;
     }
-
-    Game.PlayerSpeed = 30;
     
     var PathCollisionsSpheres = [];
 
@@ -210,12 +220,11 @@ Game.createWorld = function()
 
     Game.camera.position.copy(Game.path[Game.nextCheckpoint]);
 
-    Game.TimeBetweenEnemies = 2;
-
     this.createTerrain(PathCollisionsSpheres);
 }
 
-Game.spawnEnemy = function()
+/********************** Gomez Test **********************/
+/*Game.spawnEnemy = function()
 {
     // only for the test, i chose to create Enemy linked to the camera
     // the vecFront is the vector representing where the object will be.
@@ -227,7 +236,8 @@ Game.spawnEnemy = function()
     Game.camera.add( enemyMesh );
 
     return enemyMesh.position; // For Debugging purpose
-}
+}*/
+/********************** Gomez Test **********************/
 
 function onMouseMove( event )
 {
@@ -243,9 +253,20 @@ Game.shoot = function ()
     //@see SpawnEnemy the raycast should be tested between camera and game.scene
     Game.raycaster.setFromCamera( Game.mouse, Game.camera );
     // calculate objects intersecting the picking ray
-    var intersects = Game.raycaster.intersectObjects( Game.scene.children, true);
-    if( intersects.length > 0) {
-       Game.scene.remove( intersects[ 0 ].object )
+    var intersects = Game.raycaster.intersectObjects( Game.enemies, true );
+    if(intersects.length > 0) 
+    {
+        //console.log(intersects[0].object.parent);
+        for(var i=0; i<Game.enemies.length; i++)
+        {
+            if(Game.enemies[i].id==intersects[ 0 ].object.parent.parent.id)
+            {
+                Game.enemies.splice(i,1);   // remove the id of the ennemy killed from the array;
+                i=Game.enemies.length;
+            }
+        }
+
+        Game.scene.remove( intersects[ 0 ].object.parent.parent );
     }
 }
 
@@ -321,25 +342,108 @@ Game.resize = function ()
     }
 }
 
-
-Game.update = function (dt) 
+Game.spawnEnemy = function()
 {
-    Game.update.lastEnemySpawn = Game.update.lastEnemySpawn || 0;
-    if(Game.clock.getElapsedTime () - Game.update.lastEnemySpawn > Game.TimeBetweenEnemies)
+    var spawned=true; // returned at the end to inform if the ennemy have been instanciated or not;
+    var enemyDistance = THREE.Math.randInt ( 150, 300 );
+    var currentPosition = new THREE.Vector3().copy(Game.camera.position);
+    var nextCheckpoint = Game.nextCheckpoint;
+    var distanceBetweenCheckpoints = currentPosition.distanceTo(Game.path[nextCheckpoint]);
+    while(distanceBetweenCheckpoints < enemyDistance )
     {
-        //console.log(Game.spawnEnemy());
-        //Game.spawnEnemy();
-        Game.update.lastEnemySpawn = Game.clock.getElapsedTime ();
+        enemyDistance -= distanceBetweenCheckpoints;
+        currentPosition.copy(Game.path[nextCheckpoint]);
+
+        if(nextCheckpoint < Game.path.length-1)
+            nextCheckpoint++;
+        else
+            nextCheckpoint=0;
+
+        distanceBetweenCheckpoints = currentPosition.distanceTo(Game.path[nextCheckpoint]);
     }
-    Game.resize();
-    Game.shoot();
-    Game.camera.updateProjectionMatrix();
+    var translationVector = new THREE.Vector3().subVectors(Game.path[nextCheckpoint], currentPosition);
+    translationVector.multiplyScalar(enemyDistance);
+    translationVector.divideScalar(distanceBetweenCheckpoints);
+
+    var enemySpawnPosition = new THREE.Vector3().addVectors(currentPosition, translationVector);
+
+    // check that the ennemy can be spawned on this position (ie :  not overlapping another ennemy or a building)
+    for(var i=0; i<Game.enemies.length; i++)
+    {
+        if(Game.enemies[i].position.distanceTo(enemySpawnPosition)<Enemy.collisionRadius*4)
+        {
+            i=Game.enemies.length;
+            spawned=false;
+        }
+    }
+
+    if(spawned)
+    {
+        var enemyMesh = new Enemy( enemySpawnPosition );
+        Game.scene.add( enemyMesh );
+        Game.enemies.push(enemyMesh);
+    }
+    return spawned;
+}
+
+Game.movePlayer = function(dt)
+{
+    this.crashTest = function(Vector3from, Vector3to, distanceToCollision)
+    {
+        var raycaster = new THREE.Raycaster(Vector3from, new THREE.Vector3().subVectors( Vector3to , Vector3from ), 0, Vector3from.distanceTo(Vector3to));
+
+        var intersects = raycaster.intersectObject( Game.enemies[0], true );
+        if(intersects.length > 0) 
+        {
+            // console.log(intersects[ 0 ]);
+            if(distanceToCollision === undefined || intersects[ 0 ].distance<distanceToCollision)
+            {
+                console.log("FATALITY, You Are NOTHING !");
+                intersects[ 0 ].object.material = Enemy.crashedMaterial;
+
+              //  console.log(Game.camera.position.distanceTo(intersects[ 0 ].object.position));
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    if(Game.enemies.length > 0)
+    {
+        var distanceToCollision = Game.DistanceEnemyCollision;
+        var nextCollisionFrom = new THREE.Vector3().copy(Game.camera.position); // position as vector3
+        var nextCollisionCheckpointTo = Game.nextCheckpoint;    // checkpoint index
+
+        var distanceToNextCollisionsCheckpoint = nextCollisionFrom.distanceTo(Game.path[nextCollisionCheckpointTo]);
+
+        while(distanceToNextCollisionsCheckpoint < distanceToCollision)
+        {
+            if(this.crashTest(nextCollisionFrom, Game.path[nextCollisionCheckpointTo]))
+                distanceToCollision=0;
+
+            distanceToCollision-=distanceToNextCollisionsCheckpoint;
+
+            nextCollisionFrom = Game.path[nextCollisionCheckpointTo];
+
+            if(nextCollisionCheckpointTo < Game.path.length-1)
+                nextCollisionCheckpointTo = nextCollisionCheckpointTo+1;
+            else
+                nextCollisionCheckpointTo = 0;
+
+            distanceToNextCollisionsCheckpoint = nextCollisionFrom.distanceTo(Game.path[nextCollisionCheckpointTo]);
+        }
+
+        this.crashTest(nextCollisionFrom, Game.path[nextCollisionCheckpointTo], distanceToCollision);
+    }
 
     // if distance to the next checkpoint is shorter than distance to travel this tick 
     // then increment checkpoint
     var translateDistance = Game.PlayerSpeed*dt;
 
     var distanceToNextCheckpoint = Game.camera.position.distanceTo(Game.path[Game.nextCheckpoint]);
+
     while(distanceToNextCheckpoint < translateDistance)
     {
         translateDistance -= distanceToNextCheckpoint;
@@ -353,13 +457,28 @@ Game.update = function (dt)
         var distanceToNextCheckpoint = Game.camera.position.distanceTo(Game.path[Game.nextCheckpoint]);
     }
 
-
-   // console.log(Game.nextCheckpoint);
-
     Game.camera.lookAt(Game.path[Game.nextCheckpoint]);
-   // console.log(Game.camera.rotation);
 
     Game.camera.translateZ(-translateDistance);
+
+    for(var i=0; i<Game.enemies.length; i++)
+        Game.enemies[i].lookAt(Game.camera.position);
+}
+
+Game.update = function (dt) 
+{
+    Game.update.lastEnemySpawn = Game.update.lastEnemySpawn || 0;
+    if(Game.clock.getElapsedTime () - Game.update.lastEnemySpawn > Game.TimeBetweenEnemies)
+    {
+        //console.log(Game.camera.position.distanceTo(Game.spawnEnemy()));
+        if(Game.spawnEnemy())
+            Game.update.lastEnemySpawn = Game.clock.getElapsedTime ();
+    }
+    Game.resize();
+    Game.shoot();
+    Game.camera.updateProjectionMatrix();
+
+    Game.movePlayer(dt);
 
 /*    if(Game.isdisplayedOn3D) {
         Game.controls.update(dt);
