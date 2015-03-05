@@ -339,10 +339,27 @@ Game.resize = function ()
 
 Game.spawnEnemy = function()
 {
-    var enemyDistance = 400;
-    var enemyCheckpointSpawn = (Game.nextCheckpoint+enemyDistance) % Game.path.length;
+    var enemyDistance = 200;
+    var currentPosition = new THREE.Vector3().copy(Game.camera.position);
+    var nextCheckpoint = Game.nextCheckpoint;
+    var distanceBetweenCheckpoints = currentPosition.distanceTo(Game.path[nextCheckpoint]);
+    while(distanceBetweenCheckpoints < enemyDistance )
+    {
+        enemyDistance -= distanceBetweenCheckpoints;
+        currentPosition.copy(Game.path[nextCheckpoint]);
 
-    var enemySpawnPosition = new THREE.Vector3().copy(Game.path[enemyCheckpointSpawn]);
+        if(nextCheckpoint < Game.path.length-1)
+            nextCheckpoint++;
+        else
+            nextCheckpoint=0;
+
+        distanceBetweenCheckpoints = currentPosition.distanceTo(Game.path[nextCheckpoint]);
+    }
+    var translationVector = new THREE.Vector3().subVectors(Game.path[nextCheckpoint], currentPosition);
+    translationVector.multiplyScalar(enemyDistance);
+    translationVector.divideScalar(distanceBetweenCheckpoints);
+
+    var enemySpawnPosition = new THREE.Vector3().addVectors(currentPosition, translationVector);
     var enemyMesh = new Enemy( enemySpawnPosition );
     Game.scene.add( enemyMesh );
     Game.enemies.push(enemyMesh);
@@ -430,7 +447,7 @@ Game.update = function (dt)
     Game.update.lastEnemySpawn = Game.update.lastEnemySpawn || 0;
     if(Game.clock.getElapsedTime () - Game.update.lastEnemySpawn > Game.TimeBetweenEnemies)
     {
-        //console.log(Game.spawnEnemy());
+        //console.log(Game.camera.position.distanceTo(Game.spawnEnemy()));
         Game.spawnEnemy();
         Game.update.lastEnemySpawn = Game.clock.getElapsedTime ();
     }
