@@ -1,6 +1,7 @@
 window.Game = window.Game || {};
 
 Game.init = function () {
+
     Game.clock = new THREE.Clock();
     Game.isdisplayedOn3D = false;
     Game.mouse = new THREE.Vector2();
@@ -92,7 +93,7 @@ Game.createWorld = function()
         var terrainWidth = 1024;
         var boxWidth = 5;
         var boxHeight = 20;
-        var density = 1; // %
+        var density = 0.2; // %
         var planeGeometry = new THREE.PlaneGeometry(terrainWidth, terrainWidth);
         var material = new THREE.MeshPhongMaterial( { ambient: 0x333333, color: 0xffffff, specular: 0xffffff, shininess: 50 } );
 
