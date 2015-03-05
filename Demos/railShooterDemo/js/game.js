@@ -16,7 +16,11 @@ Game.init = function () {
     Game.effect = new THREE.StereoEffect(Game.renderer);
     Game.scene = new THREE.Scene();
 
-    Game.camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 15000);
+    Game.camera;
+    if(Game.isdisplayedOn3D)
+        Game.camera = new THREE.PerspectiveCamera(90, 1, 0.001, 700);
+    else
+        Game.camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 15000);
     //Game.camera.rotation.y = THREE.Math.degToRad(0);
    // Game.camera.lookAt(new THREE.Vector3(0,0,0));
     Game.scene.add(Game.camera);
