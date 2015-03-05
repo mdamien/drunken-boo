@@ -217,7 +217,7 @@ Game.createWorld = function()
 
     Game.camera.position.copy(Game.path[Game.nextCheckpoint]);
 
-    Game.TimeBetweenEnemies = 2;
+    Game.TimeBetweenEnemies = 0.3;
 
     this.createTerrain(PathCollisionsSpheres);
 }
@@ -343,7 +343,8 @@ Game.resize = function ()
 
 Game.spawnEnemy = function()
 {
-    var enemyDistance = 200;
+    var spawned=true; // returned at the end to inform if the ennemy have been instanciated or not;
+    var enemyDistance = THREE.Math.randInt ( 150, 300 );
     var currentPosition = new THREE.Vector3().copy(Game.camera.position);
     var nextCheckpoint = Game.nextCheckpoint;
     var distanceBetweenCheckpoints = currentPosition.distanceTo(Game.path[nextCheckpoint]);
@@ -364,11 +365,24 @@ Game.spawnEnemy = function()
     translationVector.divideScalar(distanceBetweenCheckpoints);
 
     var enemySpawnPosition = new THREE.Vector3().addVectors(currentPosition, translationVector);
-    var enemyMesh = new Enemy( enemySpawnPosition );
-    Game.scene.add( enemyMesh );
-    Game.enemies.push(enemyMesh);
- //   console.log(Game.enemies);
-    return enemyMesh.position; // For Debugging purpose
+
+    // check that the ennemy can be spawned on this position (ie :  not overlapping another ennemy or a building)
+    for(var i=0; i<Game.enemies.length; i++)
+    {
+        if(Game.enemies[i].position.distanceTo(enemySpawnPosition)<Enemy.collisionRadius*4)
+        {
+            i=Game.enemies.length;
+            spawned=false;
+        }
+    }
+
+    if(spawned)
+    {
+        var enemyMesh = new Enemy( enemySpawnPosition );
+        Game.scene.add( enemyMesh );
+        Game.enemies.push(enemyMesh);
+    }
+    return spawned;
 }
 
 Game.movePlayer = function(dt)
@@ -452,8 +466,8 @@ Game.update = function (dt)
     if(Game.clock.getElapsedTime () - Game.update.lastEnemySpawn > Game.TimeBetweenEnemies)
     {
         //console.log(Game.camera.position.distanceTo(Game.spawnEnemy()));
-        Game.spawnEnemy();
-        Game.update.lastEnemySpawn = Game.clock.getElapsedTime ();
+        if(Game.spawnEnemy())
+            Game.update.lastEnemySpawn = Game.clock.getElapsedTime ();
     }
     Game.resize();
     Game.shoot();

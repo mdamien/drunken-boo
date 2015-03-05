@@ -14,6 +14,7 @@ Enemy.material = new THREE.MeshPhongMaterial( { color: 0xffff00 } );
 Enemy.crashedMaterial = new THREE.MeshPhongMaterial( { color: 0xff0000 } );
 Enemy.type = "Enemy";
 Enemy.name = "Enemy";
+Enemy.collisionRadius = 2;
 
 Enemy.prototype = Object.create( THREE.Mesh.prototype );
 Enemy.prototype.constructor = Enemy;
