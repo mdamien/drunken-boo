@@ -24,7 +24,6 @@ loader.load(
 	function ( object ) { 
 
 		Enemy.creatureObject3D = object;
-		console.log(object);
 
 	} , 
 	// Function called when downloads progress 

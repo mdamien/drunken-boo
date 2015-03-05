@@ -34,6 +34,8 @@ Game.init = function () {
     Game.PlayerSpeed = 30;
     Game.DistanceEnemyCollision = 10;
 
+    Game.TimeBetweenEnemies = 0.9;
+
     Game.enemies = []; // array of Enemies
 
     // console.log(Game.camera.position);
@@ -218,8 +220,6 @@ Game.createWorld = function()
 
     Game.camera.position.copy(Game.path[Game.nextCheckpoint]);
 
-    Game.TimeBetweenEnemies = 0.3;
-
     this.createTerrain(PathCollisionsSpheres);
 }
 
@@ -253,20 +253,20 @@ Game.shoot = function ()
     //@see SpawnEnemy the raycast should be tested between camera and game.scene
     Game.raycaster.setFromCamera( Game.mouse, Game.camera );
     // calculate objects intersecting the picking ray
-    var intersects = Game.raycaster.intersectObjects( Game.enemies );
+    var intersects = Game.raycaster.intersectObjects( Game.enemies, true );
     if(intersects.length > 0) 
     {
-        // console.log(intersects[ 0 ].object);
+        //console.log(intersects[0].object.parent);
         for(var i=0; i<Game.enemies.length; i++)
         {
-            if(Game.enemies[i].id==intersects[ 0 ].object.id)
+            if(Game.enemies[i].id==intersects[ 0 ].object.parent.parent.id)
             {
                 Game.enemies.splice(i,1);   // remove the id of the ennemy killed from the array;
                 i=Game.enemies.length;
             }
         }
 
-        Game.scene.remove( intersects[ 0 ].object );
+        Game.scene.remove( intersects[ 0 ].object.parent.parent );
     }
 }
 
@@ -392,10 +392,11 @@ Game.movePlayer = function(dt)
     {
         var raycaster = new THREE.Raycaster(Vector3from, new THREE.Vector3().subVectors( Vector3to , Vector3from ), 0, Vector3from.distanceTo(Vector3to));
 
-        var intersects = raycaster.intersectObject( Game.enemies[0] );
+        var intersects = raycaster.intersectObject( Game.enemies[0], true );
         if(intersects.length > 0) 
         {
-            if(distanceToCollision === undefined || intersects[ 0 ].object.distance<distanceToCollision)
+            // console.log(intersects[ 0 ]);
+            if(distanceToCollision === undefined || intersects[ 0 ].distance<distanceToCollision)
             {
                 console.log("FATALITY, You Are NOTHING !");
                 intersects[ 0 ].object.material = Enemy.crashedMaterial;
@@ -459,6 +460,9 @@ Game.movePlayer = function(dt)
     Game.camera.lookAt(Game.path[Game.nextCheckpoint]);
 
     Game.camera.translateZ(-translateDistance);
+
+    for(var i=0; i<Game.enemies.length; i++)
+        Game.enemies[i].lookAt(Game.camera.position);
 }
 
 Game.update = function (dt) 
