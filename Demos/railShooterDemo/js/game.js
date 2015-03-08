@@ -95,7 +95,7 @@ Game.createWorld = function()
         var terrainWidth = 1300;
         var boxWidth = 20;
         var boxMinHeight = 20, boxMaxHeight = 100;
-        var density = 25; // %
+        var density = 20; // %
         var planeGeometry = new THREE.PlaneGeometry(terrainWidth, terrainWidth);
         var material = new THREE.MeshPhongMaterial( { ambient: 0x333333, color: 0xffffff, specular: 0xffffff, shininess: 50 } );
 
@@ -185,53 +185,6 @@ Game.createWorld = function()
         Game.camera.position.set( 0, 2000, 0 );
         Game.camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
 
-        // for ( var i=0; i<grid.length*grid[0].length*density/100; i++ ) {
-
-            // var height = boxMinHeight + THREE.Math.randInt( 0, boxMinHeight*5 );
-        //     var boxGeometry = new THREE.BoxGeometry( boxWidth, height, boxWidth );
-        //     var boxMaterial = new THREE.MeshPhongMaterial( { ambient: '#' + Math.floor( Math.random() * 16777215 ).toString( 16 )
-        // , color: 0xffffff, specular: 0xffffff, shininess: 50 } );
-
-            // gridX = THREE.Math.randInt( 0, grid.length-1 ); // grid.length;
-            // gridZ = THREE.Math.randInt( 0, grid[0].length-1 ); // grid[0].length;
-
-            // var onPath = false;
-
-            // if ( grid[gridX][gridZ] === false ) {
-
-            //     grid[gridX][gridZ] = true;
-
-            //     var boxMesh = new THREE.Mesh(boxGeometry, boxMaterial);
-            //     boxMesh.position.set( (gridX-grid.length/2)*boxWidth, boxMinHeight/2, (gridZ-grid[0].length/2)*boxWidth );
-
-            // } else {
-
-            //     onPath = true;
-
-            // }
-
-/*            for ( var j=0; j<PathCollisionsSpheres.length && !onPath; j++ ) {
-
-                if ( PathCollisionsSpheres[j].containsPoint(boxMesh.position) ) {
-
-                    onPath = true;
-
-                }
-
-            }
-
-            if ( !onPath ) {
-
-                boxMesh.position.setY( height/2 );
-                boxMesh.castShadow = true;
-                boxMesh.matrixAutoUpdate = false;
-                boxMesh.updateMatrix();
-                Game.scene.add( boxMesh );
-
-            }*/
-
-        // }
-
         var geometry = new THREE.SphereGeometry( 5, 32, 32);
         var material2 = new THREE.MeshBasicMaterial( { color: 0xffffff } );
 
@@ -312,28 +265,10 @@ Game.createWorld = function()
     Game.path = this.calculatePath(PathCollisionsSpheres);
     Game.nextCheckpoint = 0;
 
-    // console.log(Game.path);
-
     Game.camera.position.copy(Game.path[Game.nextCheckpoint]);
 
     this.createTerrain(PathCollisionsSpheres);
 }
-
-/********************** Gomez Test **********************/
-/*Game.spawnEnemy = function()
-{
-    // only for the test, i chose to create Enemy linked to the camera
-    // the vecFront is the vector representing where the object will be.
-    // in the future the enemy should be added in scene of course !
-    var vecFront = new THREE.Vector3( 0, 0, 20 );
-    vecFront.applyQuaternion ( Game.camera.quaternion );
-    //console.log( Game.camera.quaternion);
-    var enemyMesh = new Enemy( vecFront );
-    Game.camera.add( enemyMesh );
-
-    return enemyMesh.position; // For Debugging purpose
-}*/
-/********************** Gomez Test **********************/
 
 function onMouseMove( event )
 {
@@ -352,7 +287,6 @@ Game.shoot = function ()
     var intersects = Game.raycaster.intersectObjects( Game.enemies, true );
     if(intersects.length > 0) 
     {
-        //console.log(intersects[0].object.parent);
         for(var i=0; i<Game.enemies.length; i++)
         {
             if(Game.enemies[i].id==intersects[ 0 ].object.parent.parent.id)
@@ -387,15 +321,6 @@ Game.add_elements = function ()
     dirLightLeft.color.setHSL( 0.1, 0.7, 1 );
 
     Game.scene.add( dirLightLeft );
-
-
-    /*Game.textureFlare0 = THREE.ImageUtils.loadTexture( "textures/lensflare0.png" );
-    Game.textureFlare2 = THREE.ImageUtils.loadTexture( "textures/lensflare2.png" );
-    Game.textureFlare3 = THREE.ImageUtils.loadTexture( "textures/lensflare3.png" );
-
-    this.addLight( 0.55, 0.9, 0.5, 5000, 0, -1000 );
-    this.addLight( 0.08, 0.8, 0.5,    0, 0, -1000 );
-    this.addLight( 0.995, 0.5, 0.9, 5000, 5000, -1000 );*/
 }
 
 Game.addLight = function ( h, s, l, x, y, z ) {
