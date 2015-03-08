@@ -85,7 +85,7 @@ Game.init = function () {
 
       Game.add_elements();
       window.addEventListener('resize', Game.resize, false);
-      setTimeout(Game.resize, 1);   
+      setTimeout(Game.resize, 1);
 }
 
 Game.createWorld = function() {
@@ -220,13 +220,13 @@ Game.createWorld = function() {
         for ( var i=0; i<checkpoints; i++ ) {
 
             path.push(new THREE.Vector3( -Math.cos(angle*i)*radius+radius, 2, Math.sin(angle*i)*radius ));
-        
+
         }
 
         for ( var i=0; i<checkpoints; i++ ) {
 
             path.push(new THREE.Vector3( Math.cos(angle*i)*radius-radius, 2, Math.sin(angle*i)*radius ));
-       
+
         }
         /**/
         /**/
@@ -246,13 +246,13 @@ Game.createWorld = function() {
 
             smoothedPath.push(new THREE.Vector3(splineArray[0][0],splineArray[0][1],splineArray[0][2]));
             collisionsSpheres.push(new THREE.Sphere(new THREE.Vector3().copy(smoothedPath[0]), collisionSphereRadius));
-           
+
             for ( var i=1; i<splineArray.length; i++ ) {
 
                 smoothedPath.push(new THREE.Vector3(splineArray[i][0],splineArray[i][1],splineArray[i][2]));
 
                 distanceFromLast += smoothedPath[smoothedPath.length-1].distanceTo(smoothedPath[smoothedPath.length-2]);
-                
+
                 if ( distanceFromLast > collisionSphereRadius ) {
 
                     collisionsSpheres.push(new THREE.Sphere(new THREE.Vector3().copy(smoothedPath[smoothedPath.length-1]), collisionSphereRadius));
@@ -269,7 +269,7 @@ Game.createWorld = function() {
         return this.smoothPath();
 
     }
-    
+
     var PathCollisionsSpheres = [];
 
     Game.path = this.calculatePath(PathCollisionsSpheres, Math.sqrt(boxWidth*boxWidth*2));
@@ -296,7 +296,7 @@ Game.shoot = function ()
     Game.raycaster.setFromCamera( Game.mouse, Game.camera );
     // calculate objects intersecting the picking ray
     var intersects = Game.raycaster.intersectObjects( Game.enemies, true );
-    if(intersects.length > 0) 
+    if(intersects.length > 0)
     {
         for(var i=0; i<Game.enemies.length; i++)
         {
@@ -425,7 +425,7 @@ Game.movePlayer = function(dt)
         var raycaster = new THREE.Raycaster(Vector3from, new THREE.Vector3().subVectors( Vector3to , Vector3from ), 0, Vector3from.distanceTo(Vector3to));
 
         var intersects = raycaster.intersectObject( Game.enemies[0], true );
-        if(intersects.length > 0) 
+        if(intersects.length > 0)
         {
             // console.log(intersects[ 0 ]);
             if(distanceToCollision === undefined || intersects[ 0 ].distance<distanceToCollision)
@@ -470,7 +470,7 @@ Game.movePlayer = function(dt)
         this.crashTest(nextCollisionFrom, Game.path[nextCollisionCheckpointTo], distanceToCollision);
     }
 
-    // if distance to the next checkpoint is shorter than distance to travel this tick 
+    // if distance to the next checkpoint is shorter than distance to travel this tick
     // then increment checkpoint
     var translateDistance = Game.PlayerSpeed*dt;
 
@@ -545,7 +545,7 @@ Game.animate = function() {
     requestAnimationFrame(Game.animate);
       Game.update(Game.clock.getDelta());
       Game.render(Game.clock.getDelta());
-    
+
 }
 
 Game.render = function () {
