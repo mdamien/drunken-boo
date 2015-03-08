@@ -29,20 +29,6 @@ Game.init = function () {
     // Game.renderer.shadowMapEnabled = true;
     // Game.renderer.shadowMapSoft = true;
 
-    Game.createWorld();
-
-    Game.PlayerSpeed = 40;
-    Game.DistanceEnemyCollision = 10;
-
-    Game.TimeBetweenEnemies = 2;
-
-    Game.enemies = []; // array of Enemies
-
-    // console.log(Game.camera.position);
-
-    // for(var i=0; i<Game.path.length; i++)
-    //     console.log(Game.path[i]);
-
     Game.controls;
     if(Game.isdisplayedOn3D){
         Game.controls = new THREE.OrbitControls(Game.camera, Game.element);
@@ -59,8 +45,9 @@ Game.init = function () {
     {
         Game.controls = new THREE.PointerLockControls( Game.camera );
         Game.controls.enabled = true;
-        Game.controls.getObject().position.setY( 2 );
         Game.scene.add( Game.controls.getObject() );
+        Game.playerObject = Game.controls.getObject();
+        Game.playerObject.position.setY( 2 );
         // Game.controls.movementSpeed = 2500;
         // Game.controls.domElement = Game.container;
         // Game.controls.rollSpeed = Math.PI / 6;
@@ -68,8 +55,14 @@ Game.init = function () {
         // Game.controls.dragToLook = false
     }
 
-    console.log(Game.camera.position);
+    Game.createWorld();
 
+    Game.PlayerSpeed = 40;
+    Game.DistanceEnemyCollision = 10;
+
+    Game.TimeBetweenEnemies = 2;
+
+    Game.enemies = []; // array of Enemies
 
     //should be above in the else
     window.addEventListener('mousemove', onMouseMove, false);
@@ -272,7 +265,7 @@ Game.createWorld = function() {
     Game.path = this.calculatePath(PathCollisionsSpheres, Math.sqrt(boxWidth*boxWidth*2));
     Game.nextCheckpoint = 0;
 
-    Game.camera.position.copy(Game.path[Game.nextCheckpoint]);
+    Game.playerObject.position.copy( Game.path[ Game.nextCheckpoint ] );
 
     this.createTerrain(PathCollisionsSpheres);
 
@@ -380,7 +373,7 @@ Game.spawnEnemy = function()
 {
     var spawned=true; // returned at the end to inform if the ennemy have been instanciated or not;
     var enemyDistance = THREE.Math.randInt ( 150, 300 );
-    var currentPosition = new THREE.Vector3().copy(Game.camera.position);
+    var currentPosition = new THREE.Vector3().copy(Game.playerObject.position);
     var nextCheckpoint = Game.nextCheckpoint;
     var distanceBetweenCheckpoints = currentPosition.distanceTo(Game.path[nextCheckpoint]);
     while(distanceBetweenCheckpoints < enemyDistance )
@@ -447,7 +440,7 @@ Game.movePlayer = function(dt)
     if(Game.enemies.length > 0)
     {
         var distanceToCollision = Game.DistanceEnemyCollision;
-        var nextCollisionFrom = new THREE.Vector3().copy(Game.camera.position); // position as vector3
+        var nextCollisionFrom = new THREE.Vector3().copy(Game.playerObject.position); // position as vector3
         var nextCollisionCheckpointTo = Game.nextCheckpoint;    // checkpoint index
 
         var distanceToNextCollisionsCheckpoint = nextCollisionFrom.distanceTo(Game.path[nextCollisionCheckpointTo]);
@@ -476,48 +469,52 @@ Game.movePlayer = function(dt)
     // then increment checkpoint
     var translateDistance = Game.PlayerSpeed*dt;
 
-    var distanceToNextCheckpoint = Game.camera.position.distanceTo(Game.path[Game.nextCheckpoint]);
+    var distanceToNextCheckpoint = Game.playerObject.position.distanceTo(Game.path[Game.nextCheckpoint]);
 
     while(distanceToNextCheckpoint < translateDistance)
     {
         translateDistance -= distanceToNextCheckpoint;
-        Game.camera.position.copy(Game.path[Game.nextCheckpoint]);
+        Game.playerObject.position.copy(Game.path[Game.nextCheckpoint]);
 
         if(Game.nextCheckpoint < Game.path.length-1)
             Game.nextCheckpoint++;
         else
             Game.nextCheckpoint=0;
 
-        var distanceToNextCheckpoint = Game.camera.position.distanceTo(Game.path[Game.nextCheckpoint]);
+        var distanceToNextCheckpoint = Game.playerObject.position.distanceTo(Game.path[Game.nextCheckpoint]);
     }
 
-    Game.camera.lookAt(Game.path[Game.nextCheckpoint]);
+   // Game.camera.lookAt(Game.path[Game.nextCheckpoint]);
 
-    Game.camera.translateZ(-translateDistance);
+    var translationVector = new THREE.Vector3().subVectors( Game.path[Game.nextCheckpoint], Game.playerObject.position );
+    translationVector.multiplyScalar( translateDistance/Game.playerObject.position.distanceTo( Game.path[Game.nextCheckpoint] ) );
+
+    Game.playerObject.position.add( translationVector );
+    // Game.camera.translateZ(-translateDistance);
 
     for(var i=0; i<Game.enemies.length; i++)
-        Game.enemies[i].lookAt(Game.camera.position);
+        Game.enemies[i].lookAt(Game.playerObject.position);
 }
 
 Game.update = function (dt) {
 
-    // Game.update.lastEnemySpawn = Game.update.lastEnemySpawn || 0;
+    Game.update.lastEnemySpawn = Game.update.lastEnemySpawn || 0;
 
-    // if ( Game.clock.getElapsedTime() - Game.update.lastEnemySpawn > Game.TimeBetweenEnemies ) {
+    if ( Game.clock.getElapsedTime() - Game.update.lastEnemySpawn > Game.TimeBetweenEnemies ) {
 
-    //     if ( Game.spawnEnemy() ) {
+        if ( Game.spawnEnemy() ) {
 
-    //         Game.update.lastEnemySpawn = Game.clock.getElapsedTime ();
+            Game.update.lastEnemySpawn = Game.clock.getElapsedTime ();
 
-    //     }
+        }
 
-    // }
+    }
 
-    // Game.resize();
-    // Game.shoot();
-    // Game.camera.updateProjectionMatrix();
+    Game.resize();
+    Game.shoot();
+    Game.camera.updateProjectionMatrix();
 
-    // Game.movePlayer(dt);
+    Game.movePlayer(dt);
 
     if(Game.isdisplayedOn3D) {
         Game.controls.update(dt);
