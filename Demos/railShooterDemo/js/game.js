@@ -486,19 +486,25 @@ Game.movePlayer = function(dt)
         Game.enemies[i].lookAt(Game.camera.position);
 }
 
-Game.update = function (dt) 
-{
+Game.update = function (dt) {
+
     Game.update.lastEnemySpawn = Game.update.lastEnemySpawn || 0;
-    if(Game.clock.getElapsedTime () - Game.update.lastEnemySpawn > Game.TimeBetweenEnemies)
-    {
-        if(Game.spawnEnemy())
+
+    if ( Game.clock.getElapsedTime() - Game.update.lastEnemySpawn > Game.TimeBetweenEnemies ) {
+
+        if ( Game.spawnEnemy() ) {
+
             Game.update.lastEnemySpawn = Game.clock.getElapsedTime ();
+
+        }
+
     }
+
     Game.resize();
     Game.shoot();
     Game.camera.updateProjectionMatrix();
 
-   Game.movePlayer(dt);
+    Game.movePlayer(dt);
 
 /*    if(Game.isdisplayedOn3D) {
         Game.controls.update(dt);
@@ -506,6 +512,7 @@ Game.update = function (dt)
     else {
         Game.controls.update(dt);
     }*/
+
 }
 
 Game.onWindowResize = function( event ) {
