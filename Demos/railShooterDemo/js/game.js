@@ -88,12 +88,13 @@ Game.init = function () {
       setTimeout(Game.resize, 1);   
 }
 
-Game.createWorld = function()
-{
-    this.createTerrain = function(PathCollisionsSpheres)
-    {
+Game.createWorld = function() {
+
+    var boxWidth = 20;
+
+    this.createTerrain = function(PathCollisionsSpheres) {
+
         var terrainWidth = 1300;
-        var boxWidth = 20;
         var boxMinHeight = 20, boxMaxHeight = 100;
         var density = 15; // %
         var planeGeometry = new THREE.PlaneGeometry(terrainWidth, terrainWidth);
@@ -189,22 +190,25 @@ Game.createWorld = function()
         var material2 = new THREE.MeshBasicMaterial( { color: 0xffffff } );
 
         // Beautiful sky from Gomez *\0/*
-        for ( var i = 0; i < 1000; i ++ ) 
-        {
+        for ( var i = 0; i < 1000; i ++ ) {
+
             sphere = new THREE.Mesh( geometry, material2);
             sphere.position.x = 8000 * ( 2.0 * Math.random() - 1.0 );
             sphere.position.y = 8000 * ( 2.0 * Math.random() - 1.0 );
             sphere.position.z = 8000 * ( 2.0 * Math.random() - 1.0 );
 
             Game.scene.add( sphere );
+
         }
+
         terrainMesh.matrixAutoUpdate = false;
 
         Game.scene.add( terrainMesh );
+
     }
 
-    this.calculatePath = function( collisionsSpheres )
-    {
+    this.calculatePath = function( collisionsSpheres, collisionSphereRadius ) {
+
         /**************** Create your path here ****************/
         /**/
         /**/
@@ -213,21 +217,23 @@ Game.createWorld = function()
         var radius = 250;
         var angle = 2*Math.PI/checkpoints;
 
-        for(var i=0; i<checkpoints; i++)
-        {
+        for ( var i=0; i<checkpoints; i++ ) {
+
             path.push(new THREE.Vector3( -Math.cos(angle*i)*radius+radius, 2, Math.sin(angle*i)*radius ));
+        
         }
 
-        for(var i=0; i<checkpoints; i++)
-        {
+        for ( var i=0; i<checkpoints; i++ ) {
+
             path.push(new THREE.Vector3( Math.cos(angle*i)*radius-radius, 2, Math.sin(angle*i)*radius ));
+       
         }
         /**/
         /**/
         /*******************************************************/
 
-        this.smoothPath = function()
-        {
+        this.smoothPath = function() {
+
             var spline = new THREE.Spline(path);
             spline.reparametrizeByArcLength ( 6000 );
 
@@ -236,38 +242,43 @@ Game.createWorld = function()
 
             splineArray = spline.getControlPointsArray();
 
-            var collisionSphereRadius = 16;
             var distanceFromLast=0;
 
             smoothedPath.push(new THREE.Vector3(splineArray[0][0],splineArray[0][1],splineArray[0][2]));
             collisionsSpheres.push(new THREE.Sphere(new THREE.Vector3().copy(smoothedPath[0]), collisionSphereRadius));
-            for(var i=1; i<splineArray.length; i++)
-            {
+           
+            for ( var i=1; i<splineArray.length; i++ ) {
+
                 smoothedPath.push(new THREE.Vector3(splineArray[i][0],splineArray[i][1],splineArray[i][2]));
 
-
                 distanceFromLast += smoothedPath[smoothedPath.length-1].distanceTo(smoothedPath[smoothedPath.length-2]);
-                if(distanceFromLast > collisionSphereRadius)
-                {
+                
+                if ( distanceFromLast > collisionSphereRadius ) {
+
                     collisionsSpheres.push(new THREE.Sphere(new THREE.Vector3().copy(smoothedPath[smoothedPath.length-1]), collisionSphereRadius));
                     distanceFromLast=0;
+
                 }
+
             }
 
             return smoothedPath;
+
         }
 
         return this.smoothPath();
+
     }
     
     var PathCollisionsSpheres = [];
 
-    Game.path = this.calculatePath(PathCollisionsSpheres);
+    Game.path = this.calculatePath(PathCollisionsSpheres, Math.sqrt(boxWidth*boxWidth*2));
     Game.nextCheckpoint = 0;
 
     Game.camera.position.copy(Game.path[Game.nextCheckpoint]);
 
     this.createTerrain(PathCollisionsSpheres);
+
 }
 
 function onMouseMove( event )
