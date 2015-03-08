@@ -95,7 +95,7 @@ Game.createWorld = function()
         var terrainWidth = 1300;
         var boxWidth = 20;
         var boxMinHeight = 20, boxMaxHeight = 100;
-        var density = 20; // %
+        var density = 15; // %
         var planeGeometry = new THREE.PlaneGeometry(terrainWidth, terrainWidth);
         var material = new THREE.MeshPhongMaterial( { ambient: 0x333333, color: 0xffffff, specular: 0xffffff, shininess: 50 } );
 
@@ -182,8 +182,8 @@ Game.createWorld = function()
 
         }
 
-        Game.camera.position.set( 0, 2000, 0 );
-        Game.camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
+        // Game.camera.position.set( 0, 2000, 0 );
+        // Game.camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
 
         var geometry = new THREE.SphereGeometry( 5, 32, 32);
         var material2 = new THREE.MeshBasicMaterial( { color: 0xffffff } );
@@ -488,17 +488,17 @@ Game.movePlayer = function(dt)
 
 Game.update = function (dt) 
 {
-   //  Game.update.lastEnemySpawn = Game.update.lastEnemySpawn || 0;
-   //  if(Game.clock.getElapsedTime () - Game.update.lastEnemySpawn > Game.TimeBetweenEnemies)
-   //  {
-   //      if(Game.spawnEnemy())
-   //          Game.update.lastEnemySpawn = Game.clock.getElapsedTime ();
-   //  }
-   //  Game.resize();
-   //  Game.shoot();
-   //  Game.camera.updateProjectionMatrix();
+    Game.update.lastEnemySpawn = Game.update.lastEnemySpawn || 0;
+    if(Game.clock.getElapsedTime () - Game.update.lastEnemySpawn > Game.TimeBetweenEnemies)
+    {
+        if(Game.spawnEnemy())
+            Game.update.lastEnemySpawn = Game.clock.getElapsedTime ();
+    }
+    Game.resize();
+    Game.shoot();
+    Game.camera.updateProjectionMatrix();
 
-   // Game.movePlayer(dt);
+   Game.movePlayer(dt);
 
 /*    if(Game.isdisplayedOn3D) {
         Game.controls.update(dt);
@@ -506,10 +506,6 @@ Game.update = function (dt)
     else {
         Game.controls.update(dt);
     }*/
-
-
-
-    //Game.camera.position.x += dt*100;
 }
 
 Game.onWindowResize = function( event ) {
