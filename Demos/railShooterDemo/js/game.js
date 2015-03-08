@@ -165,6 +165,9 @@ Game.createWorld = function()
 
     this.calculatePath = function( collisionsSpheres )
     {
+        /**************** Create your path here ****************/
+        /**/
+        /**/
         var path = [];
         var checkpoints = 16;
         var radius = 250;
@@ -179,36 +182,42 @@ Game.createWorld = function()
         {
             path.push(new THREE.Vector3( Math.cos(angle*i)*radius-radius, 2, Math.sin(angle*i)*radius ));
         }
+        /**/
+        /**/
+        /*******************************************************/
 
-        var spline = new THREE.Spline(path);
-        spline.reparametrizeByArcLength ( 6000 );
-
-        var smoothedPath = [];
-        // console.log(spline.getControlPointsArray());
-
-        splineArray = spline.getControlPointsArray();
-
-        var collisionSphereRadius = 16;
-        var distanceFromLast=0;
-
-        smoothedPath.push(new THREE.Vector3(splineArray[0][0],splineArray[0][1],splineArray[0][2]));
-        collisionsSpheres.push(new THREE.Sphere(new THREE.Vector3().copy(smoothedPath[0]), collisionSphereRadius));
-        for(var i=1; i<splineArray.length; i++)
+        this.smoothPath = function()
         {
-            smoothedPath.push(new THREE.Vector3(splineArray[i][0],splineArray[i][1],splineArray[i][2]));
+            var spline = new THREE.Spline(path);
+            spline.reparametrizeByArcLength ( 6000 );
 
+            var smoothedPath = [];
+            // console.log(spline.getControlPointsArray());
 
-            distanceFromLast += smoothedPath[smoothedPath.length-1].distanceTo(smoothedPath[smoothedPath.length-2]);
-            if(distanceFromLast > collisionSphereRadius)
+            splineArray = spline.getControlPointsArray();
+
+            var collisionSphereRadius = 16;
+            var distanceFromLast=0;
+
+            smoothedPath.push(new THREE.Vector3(splineArray[0][0],splineArray[0][1],splineArray[0][2]));
+            collisionsSpheres.push(new THREE.Sphere(new THREE.Vector3().copy(smoothedPath[0]), collisionSphereRadius));
+            for(var i=1; i<splineArray.length; i++)
             {
-                collisionsSpheres.push(new THREE.Sphere(new THREE.Vector3().copy(smoothedPath[smoothedPath.length-1]), collisionSphereRadius));
-                distanceFromLast=0;
+                smoothedPath.push(new THREE.Vector3(splineArray[i][0],splineArray[i][1],splineArray[i][2]));
+
+
+                distanceFromLast += smoothedPath[smoothedPath.length-1].distanceTo(smoothedPath[smoothedPath.length-2]);
+                if(distanceFromLast > collisionSphereRadius)
+                {
+                    collisionsSpheres.push(new THREE.Sphere(new THREE.Vector3().copy(smoothedPath[smoothedPath.length-1]), collisionSphereRadius));
+                    distanceFromLast=0;
+                }
             }
+
+            return smoothedPath;
         }
 
-        //console.log(smoothedPath[0]);
-
-        return smoothedPath;
+        return this.smoothPath();
     }
     
     var PathCollisionsSpheres = [];
