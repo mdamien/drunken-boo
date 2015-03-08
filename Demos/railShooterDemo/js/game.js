@@ -93,9 +93,9 @@ Game.createWorld = function()
     this.createTerrain = function(PathCollisionsSpheres)
     {
         var terrainWidth = 1300;
-        var boxWidth = 40;
-        var boxMinHeight = 20;
-        var density = 5; // %
+        var boxWidth = 20;
+        var boxMinHeight = 20, boxMaxHeight = 100;
+        var density = 25; // %
         var planeGeometry = new THREE.PlaneGeometry(terrainWidth, terrainWidth);
         var material = new THREE.MeshPhongMaterial( { ambient: 0x333333, color: 0xffffff, specular: 0xffffff, shininess: 50 } );
 
@@ -116,47 +116,101 @@ Game.createWorld = function()
 
         var grid = [];
 
-        for ( var i=0; i<terrainWidth/boxWidth-1; i++ ) {
+        gridLengthX = terrainWidth/boxWidth-1, gridLengthY = terrainWidth/boxWidth-1;
+
+        for ( var i=0; i<gridLengthX+1; i++ ) {
 
             grid[i] = [];
 
-            for ( var j=0; j<terrainWidth/boxWidth-1; j++ ) {
+            for ( var j=0; j<gridLengthY+1; j++ ) {
 
-                grid[i][j] = false;
+                grid[i][j] = { full: Math.random()<density/100, color: '#ffffff' };
+
+                if ( grid[i][j].full ) {
+
+                    if ( j>0 && grid[i][j-1].full ) {
+
+                        grid[i][j].color = grid[i][j-1].color;
+
+                    } else {
+
+                        if ( i>0 && grid[i-1][j].full ) {
+
+                            grid[i][j].color = grid[i-1][j].color;
+
+                        } else {
+
+                            grid[i][j].color = '#' + Math.floor( Math.random() * 16777215 ).toString( 16 );
+
+                        }
+
+                    }
+
+                    var height = THREE.Math.randInt( boxMinHeight, boxMaxHeight );
+                    var boxGeometry = new THREE.BoxGeometry( boxWidth, height, boxWidth );
+                    var boxMaterial = new THREE.MeshPhongMaterial( { ambient: grid[i][j].color
+                    , color: 0xffffff, specular: 0xffffff, shininess: 50 } );
+
+                    var boxMesh = new THREE.Mesh(boxGeometry, boxMaterial);
+                    boxMesh.position.set( (i-gridLengthX/2)*boxWidth, boxMinHeight/2, (j-gridLengthY/2)*boxWidth );
+
+                    var onPath = false;
+
+                    for ( var k=0; k<PathCollisionsSpheres.length && !onPath; k++ ) {
+
+                        if ( PathCollisionsSpheres[k].containsPoint(boxMesh.position) ) {
+
+                            onPath = true;
+
+                        }
+
+                    }
+
+                    if ( !onPath ) {
+
+                        boxMesh.position.setY( height/2 );
+                        boxMesh.castShadow = true;
+                        boxMesh.matrixAutoUpdate = false;
+                        boxMesh.updateMatrix();
+                        Game.scene.add( boxMesh );
+
+                    }
+
+                }
 
             }
 
         }
 
-        // Game.camera.position.set( 0, 500, 0 );
-        // Game.camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
+        Game.camera.position.set( 0, 2000, 0 );
+        Game.camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
 
-        for ( var i=0; i<grid.length*grid[0].length*density/100; i++ ) {
+        // for ( var i=0; i<grid.length*grid[0].length*density/100; i++ ) {
 
-            var height = boxMinHeight + THREE.Math.randInt( 0, boxMinHeight*5 );
-            var boxGeometry = new THREE.BoxGeometry( boxWidth, height, boxWidth );
-            var boxMaterial = new THREE.MeshPhongMaterial( { ambient: '#' + Math.floor( Math.random() * 16777215 ).toString( 16 )
-        , color: 0xffffff, specular: 0xffffff, shininess: 50 } );
+            // var height = boxMinHeight + THREE.Math.randInt( 0, boxMinHeight*5 );
+        //     var boxGeometry = new THREE.BoxGeometry( boxWidth, height, boxWidth );
+        //     var boxMaterial = new THREE.MeshPhongMaterial( { ambient: '#' + Math.floor( Math.random() * 16777215 ).toString( 16 )
+        // , color: 0xffffff, specular: 0xffffff, shininess: 50 } );
 
-            gridX = THREE.Math.randInt( 0, grid.length-1 ); // grid.length;
-            gridZ = THREE.Math.randInt( 0, grid[0].length-1 ); // grid[0].length;
+            // gridX = THREE.Math.randInt( 0, grid.length-1 ); // grid.length;
+            // gridZ = THREE.Math.randInt( 0, grid[0].length-1 ); // grid[0].length;
 
-            var onPath = false;
+            // var onPath = false;
 
-            if ( grid[gridX][gridZ] === false ) {
+            // if ( grid[gridX][gridZ] === false ) {
 
-                grid[gridX][gridZ] = true;
+            //     grid[gridX][gridZ] = true;
 
-                var boxMesh = new THREE.Mesh(boxGeometry, boxMaterial);
-                boxMesh.position.set( (gridX-grid.length/2)*boxWidth, boxMinHeight/2, (gridZ-grid[0].length/2)*boxWidth );
+            //     var boxMesh = new THREE.Mesh(boxGeometry, boxMaterial);
+            //     boxMesh.position.set( (gridX-grid.length/2)*boxWidth, boxMinHeight/2, (gridZ-grid[0].length/2)*boxWidth );
 
-            } else {
+            // } else {
 
-                onPath = true;
+            //     onPath = true;
 
-            }
+            // }
 
-            for ( var j=0; j<PathCollisionsSpheres.length && !onPath; j++ ) {
+/*            for ( var j=0; j<PathCollisionsSpheres.length && !onPath; j++ ) {
 
                 if ( PathCollisionsSpheres[j].containsPoint(boxMesh.position) ) {
 
@@ -174,9 +228,9 @@ Game.createWorld = function()
                 boxMesh.updateMatrix();
                 Game.scene.add( boxMesh );
 
-            }
+            }*/
 
-        }
+        // }
 
         var geometry = new THREE.SphereGeometry( 5, 32, 32);
         var material2 = new THREE.MeshBasicMaterial( { color: 0xffffff } );
@@ -509,18 +563,17 @@ Game.movePlayer = function(dt)
 
 Game.update = function (dt) 
 {
-    Game.update.lastEnemySpawn = Game.update.lastEnemySpawn || 0;
-    if(Game.clock.getElapsedTime () - Game.update.lastEnemySpawn > Game.TimeBetweenEnemies)
-    {
-        //console.log(Game.camera.position.distanceTo(Game.spawnEnemy()));
-        if(Game.spawnEnemy())
-            Game.update.lastEnemySpawn = Game.clock.getElapsedTime ();
-    }
-    Game.resize();
-    Game.shoot();
-    Game.camera.updateProjectionMatrix();
+   //  Game.update.lastEnemySpawn = Game.update.lastEnemySpawn || 0;
+   //  if(Game.clock.getElapsedTime () - Game.update.lastEnemySpawn > Game.TimeBetweenEnemies)
+   //  {
+   //      if(Game.spawnEnemy())
+   //          Game.update.lastEnemySpawn = Game.clock.getElapsedTime ();
+   //  }
+   //  Game.resize();
+   //  Game.shoot();
+   //  Game.camera.updateProjectionMatrix();
 
-   Game.movePlayer(dt);
+   // Game.movePlayer(dt);
 
 /*    if(Game.isdisplayedOn3D) {
         Game.controls.update(dt);
