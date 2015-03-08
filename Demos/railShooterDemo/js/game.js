@@ -26,8 +26,8 @@ Game.init = function () {
    // Game.camera.lookAt(new THREE.Vector3(0,0,0));
     Game.scene.add(Game.camera);
 
-    Game.renderer.shadowMapEnabled = true;
-    Game.renderer.shadowMapSoft = true;
+    // Game.renderer.shadowMapEnabled = true;
+    // Game.renderer.shadowMapSoft = true;
 
     Game.createWorld();
 
@@ -177,7 +177,7 @@ Game.createWorld = function() {
 
         // Game.camera.position.set( 0, 2000, 0 );
         // Game.camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
-
+/*
         var geometry = new THREE.SphereGeometry( 5, 32, 32);
         var material2 = new THREE.MeshBasicMaterial( { color: 0xffffff } );
 
@@ -192,7 +192,7 @@ Game.createWorld = function() {
             Game.scene.add( sphere );
 
         }
-
+*/
         terrainMesh.matrixAutoUpdate = false;
 
         Game.scene.add( terrainMesh );
