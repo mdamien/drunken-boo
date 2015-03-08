@@ -31,10 +31,10 @@ Game.init = function () {
 
     Game.createWorld();
 
-    Game.PlayerSpeed = 30;
+    Game.PlayerSpeed = 40;
     Game.DistanceEnemyCollision = 10;
 
-    Game.TimeBetweenEnemies = 0.9;
+    Game.TimeBetweenEnemies = 2;
 
     Game.enemies = []; // array of Enemies
 
@@ -92,10 +92,10 @@ Game.createWorld = function()
 {
     this.createTerrain = function(PathCollisionsSpheres)
     {
-        var terrainWidth = 1024;
-        var boxWidth = 5;
-        var boxHeight = 20;
-        var density = 0.2; // %
+        var terrainWidth = 1000;
+        var boxWidth = 20;
+        var boxMinHeight = 20;
+        var density = 3; // %
         var planeGeometry = new THREE.PlaneGeometry(terrainWidth, terrainWidth);
         var material = new THREE.MeshPhongMaterial( { ambient: 0x333333, color: 0xffffff, specular: 0xffffff, shininess: 50 } );
 
@@ -106,43 +106,77 @@ Game.createWorld = function()
         terrainMesh.rotation.x = THREE.Math.degToRad(-90);
         terrainMesh.updateMatrix();
 
-        for(var i=0 ; i<PathCollisionsSpheres.length; i++)
-        {
+        for ( var i=0; i<PathCollisionsSpheres.length; i++ ) {
+
             var center = new THREE.Vector3().copy(PathCollisionsSpheres[i].center);
-            center.y = boxHeight/2;
+            center.y = boxMinHeight/2;
             PathCollisionsSpheres[i].set(center, PathCollisionsSpheres[i].radius);
+
         }
 
-        for(var i=0; i<terrainWidth*terrainWidth*density/(100*boxWidth*boxWidth); i++)
-        {
-            var boxGeometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxWidth);
-            var boxMaterial = new THREE.MeshPhongMaterial( { ambient: '#'+Math.floor(Math.random()*16777215).toString(16)
+        var grid = [];
+
+        for ( var i=0; i<terrainWidth/boxWidth-1; i++ ) {
+
+            grid[i] = [];
+
+            for ( var j=0; j<terrainWidth/boxWidth-1; j++ ) {
+
+                grid[i][j] = false;
+
+            }
+
+        }
+
+        // Game.camera.position.set( 0, 500, 0 );
+        // Game.camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
+
+        for ( var i=0; i<grid.length*grid[0].length*density/100; i++ ) {
+
+            var height = boxMinHeight + THREE.Math.randInt( 0, boxMinHeight*5 );
+            var boxGeometry = new THREE.BoxGeometry( boxWidth, height, boxWidth );
+            var boxMaterial = new THREE.MeshPhongMaterial( { ambient: '#' + Math.floor( Math.random() * 16777215 ).toString( 16 )
         , color: 0xffffff, specular: 0xffffff, shininess: 50 } );
 
-            var boxMesh = new THREE.Mesh(boxGeometry, boxMaterial);
-
-            boxMesh.position.x = terrainWidth/2 * ( 2.0 * Math.random() - 1.0 );
-            boxMesh.position.y = boxHeight/2;
-            boxMesh.position.z = terrainWidth/2 * ( 2.0 * Math.random() - 1.0 );
-
-            boxMesh.updateMatrix();
+            gridX = THREE.Math.randInt( 0, grid.length-1 ); // grid.length;
+            gridZ = THREE.Math.randInt( 0, grid[0].length-1 ); // grid[0].length;
 
             var onPath = false;
 
-            //console.log(PathCollisionsSpheres.length);
+            if ( grid[gridX][gridZ] === false ) {
 
-            for(var j=0; j<PathCollisionsSpheres.length && !onPath; j++)
-            {
-                if(PathCollisionsSpheres[j].containsPoint(boxMesh.position))
-                    onPath=true;
+                grid[gridX][gridZ] = true;
+
+                var boxMesh = new THREE.Mesh(boxGeometry, boxMaterial);
+                boxMesh.position.x = (gridX-grid.length/2)*boxWidth;
+                boxMesh.position.y = height/2;
+                boxMesh.position.z = (gridZ-grid[0].length/2)*boxWidth;
+
+            } else {
+
+                onPath = true;
+
             }
 
-            if(!onPath)
-            {
+            for ( var j=0; j<PathCollisionsSpheres.length && !onPath; j++ ) {
+
+                if ( PathCollisionsSpheres[j].containsPoint(boxMesh.position) ) {
+
+                    onPath = true;
+
+                }
+
+            }
+
+            if ( !onPath ) {
+
                 boxMesh.castShadow = true;
                 boxMesh.matrixAutoUpdate = false;
+                boxMesh.updateMatrix();
                 Game.scene.add( boxMesh );
+
             }
+
         }
 
         var geometry = new THREE.SphereGeometry( 5, 32, 32);
@@ -487,7 +521,7 @@ Game.update = function (dt)
     Game.shoot();
     Game.camera.updateProjectionMatrix();
 
-    Game.movePlayer(dt);
+   Game.movePlayer(dt);
 
 /*    if(Game.isdisplayedOn3D) {
         Game.controls.update(dt);
