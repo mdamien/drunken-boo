@@ -282,25 +282,30 @@ function onMouseMove( event )
     Game.mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 }
 
-Game.shoot = function ()
-{
+Game.shoot = function () {
+
     //@see SpawnEnemy the raycast should be tested between camera and game.scene
     Game.raycaster.setFromCamera( Game.mouse, Game.camera );
     // calculate objects intersecting the picking ray
     var intersects = Game.raycaster.intersectObjects( Game.enemies, true );
-    if(intersects.length > 0)
-    {
-        for(var i=0; i<Game.enemies.length; i++)
-        {
-            if(Game.enemies[i].id==intersects[ 0 ].object.parent.parent.id)
-            {
-                Game.enemies.splice(i,1);   // remove the id of the ennemy killed from the array;
+
+    if ( intersects.length > 0 ) {
+
+        for ( var i=0; i<Game.enemies.length; i++ ) {
+
+            if ( Game.enemies[i].id==intersects[ 0 ].object.parent.parent.id ) {
+
+                Game.enemies.splice( i, 1 );   // remove the id of the ennemy killed from the array;
                 i=Game.enemies.length;
+
             }
+
         }
 
         Game.scene.remove( intersects[ 0 ].object.parent.parent );
+
     }
+
 }
 
 Game.add_elements = function ()
