@@ -92,10 +92,10 @@ Game.createWorld = function()
 {
     this.createTerrain = function(PathCollisionsSpheres)
     {
-        var terrainWidth = 1000;
-        var boxWidth = 20;
+        var terrainWidth = 1300;
+        var boxWidth = 40;
         var boxMinHeight = 20;
-        var density = 3; // %
+        var density = 5; // %
         var planeGeometry = new THREE.PlaneGeometry(terrainWidth, terrainWidth);
         var material = new THREE.MeshPhongMaterial( { ambient: 0x333333, color: 0xffffff, specular: 0xffffff, shininess: 50 } );
 
@@ -148,9 +148,7 @@ Game.createWorld = function()
                 grid[gridX][gridZ] = true;
 
                 var boxMesh = new THREE.Mesh(boxGeometry, boxMaterial);
-                boxMesh.position.x = (gridX-grid.length/2)*boxWidth;
-                boxMesh.position.y = height/2;
-                boxMesh.position.z = (gridZ-grid[0].length/2)*boxWidth;
+                boxMesh.position.set( (gridX-grid.length/2)*boxWidth, boxMinHeight/2, (gridZ-grid[0].length/2)*boxWidth );
 
             } else {
 
@@ -170,6 +168,7 @@ Game.createWorld = function()
 
             if ( !onPath ) {
 
+                boxMesh.position.setY( height/2 );
                 boxMesh.castShadow = true;
                 boxMesh.matrixAutoUpdate = false;
                 boxMesh.updateMatrix();
