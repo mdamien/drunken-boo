@@ -14,11 +14,11 @@ Game.init = function () {
     //instanciate a new stereoEffect even if it's not used afterward
     Game.effect = new THREE.StereoEffect(Game.renderer);
     Game.scene = new THREE.Scene();
-    Game.camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 15000);
-    Game.camera.position.set(0, 10, 0);
-    Game.scene.add(Game.camera);
+    
+    Game.camera;
     Game.controls;
     if(Game.isdisplayedOn3D){
+        Game.camera = new THREE.PerspectiveCamera(90, 1, 0.01, 7000);
         Game.controls = new THREE.OrbitControls(Game.camera, Game.element);
         Game.controls.rotateUp(Math.PI / 4);
         Game.controls.target.set(
@@ -29,9 +29,9 @@ Game.init = function () {
         Game.controls.noZoom = true;
         Game.controls.noPan = true;
     }
-
     else
     {
+        Game.camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 15000);
         Game.controls = new THREE.FlyControls( Game.camera );
         Game.controls.movementSpeed = 2500;
         Game.controls.domElement = Game.container;
@@ -42,6 +42,8 @@ Game.init = function () {
 
         window.addEventListener('mousemove', onMouseMove, true);
     }
+    Game.camera.position.set(0, 10, 0);
+    Game.scene.add(Game.camera);
 
     function setOrientationControls(e) {
     if (!e.alpha) {

@@ -12,7 +12,7 @@ window.Game = window.Game || {};
 Game.init = function () {
     Game.clock = new THREE.Clock();
     // boolean variable to choose the desktop/carboard Mode
-    Game.isCardboardViewport = true;
+    Game.isCardboardViewport = false;
 
     Game.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 
@@ -23,13 +23,12 @@ Game.init = function () {
     // the Strereoscopical transformation 
     Game.effect = new THREE.StereoEffect(Game.renderer);
     Game.scene = new THREE.Scene();
-
-    Game.camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 15000);
-    Game.camera.position.set(0, 10, 0);
-    Game.scene.add(Game.camera);
-
+    
+    Game.camera;
     Game.controls;
+    
     if(Game.isCardboardViewport){
+        Game.camera = new THREE.PerspectiveCamera(90, 1, 0.01, 7000);
         Game.controls = new THREE.OrbitControls(Game.camera, Game.element);
         Game.controls.rotateUp(Math.PI / 4);
         Game.controls.target.set(
@@ -42,6 +41,7 @@ Game.init = function () {
     }
     else
     {
+        Game.camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 15000);
         Game.controls = new THREE.FlyControls( Game.camera );
         Game.controls.movementSpeed = 2500;
         Game.controls.domElement = Game.container;
@@ -49,6 +49,8 @@ Game.init = function () {
         Game.controls.autoForward = false;
         Game.controls.dragToLook = false
     }
+    Game.camera.position.set(0, 10, 0);
+    Game.scene.add(Game.camera);
 
     function setOrientationControls(e) {
     if (!e.alpha) {
