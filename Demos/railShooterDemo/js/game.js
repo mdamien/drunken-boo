@@ -24,7 +24,7 @@ Game.init = function () {
         Game.camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 15000);
     //Game.camera.rotation.y = THREE.Math.degToRad(0);
    // Game.camera.lookAt(new THREE.Vector3(0,0,0));
-    Game.scene.add(Game.camera);
+    // Game.scene.add(Game.camera);
 
     // Game.renderer.shadowMapEnabled = true;
     // Game.renderer.shadowMapSoft = true;
@@ -43,7 +43,7 @@ Game.init = function () {
     // for(var i=0; i<Game.path.length; i++)
     //     console.log(Game.path[i]);
 
-/*    Game.controls;
+    Game.controls;
     if(Game.isdisplayedOn3D){
         Game.controls = new THREE.OrbitControls(Game.camera, Game.element);
         Game.controls.rotateUp(Math.PI / 4);
@@ -57,15 +57,20 @@ Game.init = function () {
     }
     else
     {
-        Game.controls = new THREE.FlyControls( Game.camera );
-        Game.controls.movementSpeed = 2500;
-        Game.controls.domElement = Game.container;
-        Game.controls.rollSpeed = Math.PI / 6;
-        Game.controls.autoForward = false;
-        Game.controls.dragToLook = false
+        Game.controls = new THREE.PointerLockControls( Game.camera );
+        Game.controls.enabled = true;
+        Game.controls.getObject().position.setY( 2 );
+        Game.scene.add( Game.controls.getObject() );
+        // Game.controls.movementSpeed = 2500;
+        // Game.controls.domElement = Game.container;
+        // Game.controls.rollSpeed = Math.PI / 6;
+        // Game.controls.autoForward = false;
+        // Game.controls.dragToLook = false
     }
 
-*/
+    console.log(Game.camera.position);
+
+
     //should be above in the else
     window.addEventListener('mousemove', onMouseMove, false);
     function setOrientationControls(e) {
@@ -496,30 +501,30 @@ Game.movePlayer = function(dt)
 
 Game.update = function (dt) {
 
-    Game.update.lastEnemySpawn = Game.update.lastEnemySpawn || 0;
+    // Game.update.lastEnemySpawn = Game.update.lastEnemySpawn || 0;
 
-    if ( Game.clock.getElapsedTime() - Game.update.lastEnemySpawn > Game.TimeBetweenEnemies ) {
+    // if ( Game.clock.getElapsedTime() - Game.update.lastEnemySpawn > Game.TimeBetweenEnemies ) {
 
-        if ( Game.spawnEnemy() ) {
+    //     if ( Game.spawnEnemy() ) {
 
-            Game.update.lastEnemySpawn = Game.clock.getElapsedTime ();
+    //         Game.update.lastEnemySpawn = Game.clock.getElapsedTime ();
 
-        }
+    //     }
 
-    }
+    // }
 
-    Game.resize();
-    Game.shoot();
-    Game.camera.updateProjectionMatrix();
+    // Game.resize();
+    // Game.shoot();
+    // Game.camera.updateProjectionMatrix();
 
-    Game.movePlayer(dt);
+    // Game.movePlayer(dt);
 
-/*    if(Game.isdisplayedOn3D) {
+    if(Game.isdisplayedOn3D) {
         Game.controls.update(dt);
     }
     else {
-        Game.controls.update(dt);
-    }*/
+        //Game.controls.update();
+    }
 
 }
 
