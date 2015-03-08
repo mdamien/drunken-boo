@@ -93,7 +93,7 @@ Game.createWorld = function() {
     var boxWidth = 20;
     var terrainWidth = 1300;
     var boxMinHeight = 10, boxMaxHeight = 80;
-    var density = 8; // %
+    var density = 5; // %
 
     this.createTerrain = function(PathCollisionsSpheres) {
 
