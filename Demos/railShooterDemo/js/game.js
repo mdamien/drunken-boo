@@ -26,15 +26,15 @@ Game.init = function () {
    // Game.camera.lookAt(new THREE.Vector3(0,0,0));
     Game.scene.add(Game.camera);
 
-    Game.renderer.shadowMapEnabled = true;
-    Game.renderer.shadowMapSoft = true;
+    // Game.renderer.shadowMapEnabled = true;
+    // Game.renderer.shadowMapSoft = true;
 
     Game.createWorld();
 
-    Game.PlayerSpeed = 30;
+    Game.PlayerSpeed = 40;
     Game.DistanceEnemyCollision = 10;
 
-    Game.TimeBetweenEnemies = 0.9;
+    Game.TimeBetweenEnemies = 2;
 
     Game.enemies = []; // array of Enemies
 
@@ -85,17 +85,18 @@ Game.init = function () {
 
       Game.add_elements();
       window.addEventListener('resize', Game.resize, false);
-      setTimeout(Game.resize, 1);   
+      setTimeout(Game.resize, 1);
 }
 
-Game.createWorld = function()
-{
-    this.createTerrain = function(PathCollisionsSpheres)
-    {
-        var terrainWidth = 1024;
-        var boxWidth = 5;
-        var boxHeight = 20;
-        var density = 0.2; // %
+Game.createWorld = function() {
+
+    var boxWidth = 20;
+    var terrainWidth = 1300;
+    var boxMinHeight = 10, boxMaxHeight = 80;
+    var density = 5; // %
+
+    this.createTerrain = function(PathCollisionsSpheres) {
+
         var planeGeometry = new THREE.PlaneGeometry(terrainWidth, terrainWidth);
         var material = new THREE.MeshPhongMaterial( { ambient: 0x333333, color: 0xffffff, specular: 0xffffff, shininess: 50 } );
 
@@ -106,138 +107,171 @@ Game.createWorld = function()
         terrainMesh.rotation.x = THREE.Math.degToRad(-90);
         terrainMesh.updateMatrix();
 
-        for(var i=0 ; i<PathCollisionsSpheres.length; i++)
-        {
-            var center = new THREE.Vector3().copy(PathCollisionsSpheres[i].center);
-            center.y = boxHeight/2;
-            PathCollisionsSpheres[i].set(center, PathCollisionsSpheres[i].radius);
-        }
+        var grid = [];
 
-        for(var i=0; i<terrainWidth*terrainWidth*density/(100*boxWidth*boxWidth); i++)
-        {
-            var boxGeometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxWidth);
-            var boxMaterial = new THREE.MeshPhongMaterial( { ambient: '#'+Math.floor(Math.random()*16777215).toString(16)
-        , color: 0xffffff, specular: 0xffffff, shininess: 50 } );
+        gridLengthX = terrainWidth/boxWidth-1, gridLengthY = terrainWidth/boxWidth-1;
 
-            var boxMesh = new THREE.Mesh(boxGeometry, boxMaterial);
+        for ( var i=0; i<gridLengthX+1; i++ ) {
 
-            boxMesh.position.x = terrainWidth/2 * ( 2.0 * Math.random() - 1.0 );
-            boxMesh.position.y = boxHeight/2;
-            boxMesh.position.z = terrainWidth/2 * ( 2.0 * Math.random() - 1.0 );
+            grid[i] = [];
 
-            boxMesh.updateMatrix();
+            for ( var j=0; j<gridLengthY+1; j++ ) {
 
-            var onPath = false;
+                grid[i][j] = { full: Math.random()<density/100, color: '#ffffff' };
 
-            //console.log(PathCollisionsSpheres.length);
+                if ( grid[i][j].full ) {
 
-            for(var j=0; j<PathCollisionsSpheres.length && !onPath; j++)
-            {
-                if(PathCollisionsSpheres[j].containsPoint(boxMesh.position))
-                    onPath=true;
+                    if ( j>0 && grid[i][j-1].full ) {
+
+                        grid[i][j].color = grid[i][j-1].color;
+
+                    } else {
+
+                        if ( i>0 && grid[i-1][j].full ) {
+
+                            grid[i][j].color = grid[i-1][j].color;
+
+                        } else {
+
+                            grid[i][j].color = '#' + Math.floor( Math.random() * 16777215 ).toString( 16 );
+
+                        }
+
+                    }
+
+                    var height = THREE.Math.randInt( boxMinHeight, boxMaxHeight );
+                    var boxGeometry = new THREE.BoxGeometry( boxWidth, height, boxWidth );
+                    var boxMaterial = new THREE.MeshPhongMaterial( { ambient: grid[i][j].color
+                    , color: 0xffffff, specular: 0xffffff, shininess: 50 } );
+
+                    var boxMesh = new THREE.Mesh(boxGeometry, boxMaterial);
+                    boxMesh.position.set( (i-gridLengthX/2)*boxWidth, 2, (j-gridLengthY/2)*boxWidth );
+
+                    var onPath = false;
+
+                    for ( var k=0; k<PathCollisionsSpheres.length && !onPath; k++ ) {
+
+                        if ( PathCollisionsSpheres[k].containsPoint(boxMesh.position) ) {
+
+                            onPath = true;
+
+                        }
+
+                    }
+
+                    if ( !onPath ) {
+
+                        boxMesh.position.setY( height/2 );
+                        boxMesh.castShadow = true;
+                        boxMesh.matrixAutoUpdate = false;
+                        boxMesh.updateMatrix();
+                        Game.scene.add( boxMesh );
+
+                    }
+
+                }
+
             }
 
-            if(!onPath)
-            {
-                boxMesh.castShadow = true;
-                boxMesh.matrixAutoUpdate = false;
-                Game.scene.add( boxMesh );
-            }
         }
 
+        // Game.camera.position.set( 0, 2000, 0 );
+        // Game.camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
+/*
         var geometry = new THREE.SphereGeometry( 5, 32, 32);
         var material2 = new THREE.MeshBasicMaterial( { color: 0xffffff } );
 
         // Beautiful sky from Gomez *\0/*
-        for ( var i = 0; i < 1000; i ++ ) 
-        {
+        for ( var i = 0; i < 1000; i ++ ) {
+
             sphere = new THREE.Mesh( geometry, material2);
             sphere.position.x = 8000 * ( 2.0 * Math.random() - 1.0 );
             sphere.position.y = 8000 * ( 2.0 * Math.random() - 1.0 );
             sphere.position.z = 8000 * ( 2.0 * Math.random() - 1.0 );
 
             Game.scene.add( sphere );
+
         }
+*/
         terrainMesh.matrixAutoUpdate = false;
 
         Game.scene.add( terrainMesh );
+
     }
 
-    this.calculatePath = function( collisionsSpheres )
-    {
+    this.calculatePath = function( collisionsSpheres, collisionSphereRadius ) {
+
+        /**************** Create your path here ****************/
+        /**/
+        /**/
         var path = [];
         var checkpoints = 16;
         var radius = 250;
         var angle = 2*Math.PI/checkpoints;
 
-        for(var i=0; i<checkpoints; i++)
-        {
+        for ( var i=0; i<checkpoints; i++ ) {
+
             path.push(new THREE.Vector3( -Math.cos(angle*i)*radius+radius, 2, Math.sin(angle*i)*radius ));
+
         }
 
-        for(var i=0; i<checkpoints; i++)
-        {
+        for ( var i=0; i<checkpoints; i++ ) {
+
             path.push(new THREE.Vector3( Math.cos(angle*i)*radius-radius, 2, Math.sin(angle*i)*radius ));
+
         }
+        /**/
+        /**/
+        /*******************************************************/
 
-        var spline = new THREE.Spline(path);
-        spline.reparametrizeByArcLength ( 6000 );
+        this.smoothPath = function() {
 
-        var smoothedPath = [];
-        // console.log(spline.getControlPointsArray());
+            var spline = new THREE.Spline(path);
+            spline.reparametrizeByArcLength ( 6000 );
 
-        splineArray = spline.getControlPointsArray();
+            var smoothedPath = [];
+            // console.log(spline.getControlPointsArray());
 
-        var collisionSphereRadius = 16;
-        var distanceFromLast=0;
+            splineArray = spline.getControlPointsArray();
 
-        smoothedPath.push(new THREE.Vector3(splineArray[0][0],splineArray[0][1],splineArray[0][2]));
-        collisionsSpheres.push(new THREE.Sphere(new THREE.Vector3().copy(smoothedPath[0]), collisionSphereRadius));
-        for(var i=1; i<splineArray.length; i++)
-        {
-            smoothedPath.push(new THREE.Vector3(splineArray[i][0],splineArray[i][1],splineArray[i][2]));
+            var distanceFromLast=0;
 
+            smoothedPath.push(new THREE.Vector3(splineArray[0][0],splineArray[0][1],splineArray[0][2]));
+            collisionsSpheres.push(new THREE.Sphere(new THREE.Vector3().copy(smoothedPath[0]), collisionSphereRadius));
 
-            distanceFromLast += smoothedPath[smoothedPath.length-1].distanceTo(smoothedPath[smoothedPath.length-2]);
-            if(distanceFromLast > collisionSphereRadius)
-            {
-                collisionsSpheres.push(new THREE.Sphere(new THREE.Vector3().copy(smoothedPath[smoothedPath.length-1]), collisionSphereRadius));
-                distanceFromLast=0;
+            for ( var i=1; i<splineArray.length; i++ ) {
+
+                smoothedPath.push(new THREE.Vector3(splineArray[i][0],splineArray[i][1],splineArray[i][2]));
+
+                distanceFromLast += smoothedPath[smoothedPath.length-1].distanceTo(smoothedPath[smoothedPath.length-2]);
+
+                if ( distanceFromLast > collisionSphereRadius ) {
+
+                    collisionsSpheres.push(new THREE.Sphere(new THREE.Vector3().copy(smoothedPath[smoothedPath.length-1]), collisionSphereRadius));
+                    distanceFromLast=0;
+
+                }
+
             }
+
+            return smoothedPath;
+
         }
 
-        //console.log(smoothedPath[0]);
+        return this.smoothPath();
 
-        return smoothedPath;
     }
-    
+
     var PathCollisionsSpheres = [];
 
-    Game.path = this.calculatePath(PathCollisionsSpheres);
+    Game.path = this.calculatePath(PathCollisionsSpheres, Math.sqrt(boxWidth*boxWidth*2));
     Game.nextCheckpoint = 0;
-
-    // console.log(Game.path);
 
     Game.camera.position.copy(Game.path[Game.nextCheckpoint]);
 
     this.createTerrain(PathCollisionsSpheres);
+
 }
-
-/********************** Gomez Test **********************/
-/*Game.spawnEnemy = function()
-{
-    // only for the test, i chose to create Enemy linked to the camera
-    // the vecFront is the vector representing where the object will be.
-    // in the future the enemy should be added in scene of course !
-    var vecFront = new THREE.Vector3( 0, 0, 20 );
-    vecFront.applyQuaternion ( Game.camera.quaternion );
-    //console.log( Game.camera.quaternion);
-    var enemyMesh = new Enemy( vecFront );
-    Game.camera.add( enemyMesh );
-
-    return enemyMesh.position; // For Debugging purpose
-}*/
-/********************** Gomez Test **********************/
 
 function onMouseMove( event )
 {
@@ -248,26 +282,30 @@ function onMouseMove( event )
     Game.mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 }
 
-Game.shoot = function ()
-{
+Game.shoot = function () {
+
     //@see SpawnEnemy the raycast should be tested between camera and game.scene
     Game.raycaster.setFromCamera( Game.mouse, Game.camera );
     // calculate objects intersecting the picking ray
     var intersects = Game.raycaster.intersectObjects( Game.enemies, true );
-    if(intersects.length > 0) 
-    {
-        //console.log(intersects[0].object.parent);
-        for(var i=0; i<Game.enemies.length; i++)
-        {
-            if(Game.enemies[i].id==intersects[ 0 ].object.parent.parent.id)
-            {
-                Game.enemies.splice(i,1);   // remove the id of the ennemy killed from the array;
+
+    if ( intersects.length > 0 ) {
+
+        for ( var i=0; i<Game.enemies.length; i++ ) {
+
+            if ( Game.enemies[i].id==intersects[ 0 ].object.parent.parent.id ) {
+
+                Game.enemies.splice( i, 1 );   // remove the id of the ennemy killed from the array;
                 i=Game.enemies.length;
+
             }
+
         }
 
         Game.scene.remove( intersects[ 0 ].object.parent.parent );
+
     }
+
 }
 
 Game.add_elements = function ()
@@ -291,15 +329,6 @@ Game.add_elements = function ()
     dirLightLeft.color.setHSL( 0.1, 0.7, 1 );
 
     Game.scene.add( dirLightLeft );
-
-
-    /*Game.textureFlare0 = THREE.ImageUtils.loadTexture( "textures/lensflare0.png" );
-    Game.textureFlare2 = THREE.ImageUtils.loadTexture( "textures/lensflare2.png" );
-    Game.textureFlare3 = THREE.ImageUtils.loadTexture( "textures/lensflare3.png" );
-
-    this.addLight( 0.55, 0.9, 0.5, 5000, 0, -1000 );
-    this.addLight( 0.08, 0.8, 0.5,    0, 0, -1000 );
-    this.addLight( 0.995, 0.5, 0.9, 5000, 5000, -1000 );*/
 }
 
 Game.addLight = function ( h, s, l, x, y, z ) {
@@ -393,7 +422,7 @@ Game.movePlayer = function(dt)
         var raycaster = new THREE.Raycaster(Vector3from, new THREE.Vector3().subVectors( Vector3to , Vector3from ), 0, Vector3from.distanceTo(Vector3to));
 
         var intersects = raycaster.intersectObject( Game.enemies[0], true );
-        if(intersects.length > 0) 
+        if(intersects.length > 0)
         {
             // console.log(intersects[ 0 ]);
             if(distanceToCollision === undefined || intersects[ 0 ].distance<distanceToCollision)
@@ -438,7 +467,7 @@ Game.movePlayer = function(dt)
         this.crashTest(nextCollisionFrom, Game.path[nextCollisionCheckpointTo], distanceToCollision);
     }
 
-    // if distance to the next checkpoint is shorter than distance to travel this tick 
+    // if distance to the next checkpoint is shorter than distance to travel this tick
     // then increment checkpoint
     var translateDistance = Game.PlayerSpeed*dt;
 
@@ -465,15 +494,20 @@ Game.movePlayer = function(dt)
         Game.enemies[i].lookAt(Game.camera.position);
 }
 
-Game.update = function (dt) 
-{
+Game.update = function (dt) {
+
     Game.update.lastEnemySpawn = Game.update.lastEnemySpawn || 0;
-    if(Game.clock.getElapsedTime () - Game.update.lastEnemySpawn > Game.TimeBetweenEnemies)
-    {
-        //console.log(Game.camera.position.distanceTo(Game.spawnEnemy()));
-        if(Game.spawnEnemy())
+
+    if ( Game.clock.getElapsedTime() - Game.update.lastEnemySpawn > Game.TimeBetweenEnemies ) {
+
+        if ( Game.spawnEnemy() ) {
+
             Game.update.lastEnemySpawn = Game.clock.getElapsedTime ();
+
+        }
+
     }
+
     Game.resize();
     Game.shoot();
     Game.camera.updateProjectionMatrix();
@@ -487,9 +521,6 @@ Game.update = function (dt)
         Game.controls.update(dt);
     }*/
 
-
-
-    //Game.camera.position.x += dt*100;
 }
 
 Game.onWindowResize = function( event ) {
@@ -511,7 +542,7 @@ Game.animate = function() {
     requestAnimationFrame(Game.animate);
       Game.update(Game.clock.getDelta());
       Game.render(Game.clock.getDelta());
-    
+
 }
 
 Game.render = function () {
