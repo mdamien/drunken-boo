@@ -10,19 +10,26 @@ Game.init = function () {
 
     Game.element = Game.renderer.domElement;
     Game.container = document.getElementById('example');
-    Game.container.appendChild(Game.element);
+    Game.container.appendChild( Game.element );
 
     //instanciate a new stereoEffect even if it's not used afterward
     Game.effect = new THREE.StereoEffect(Game.renderer);
     Game.scene = new THREE.Scene();
 
+    Game.cameraOrtho = new THREE.OrthographicCamera(-window.innerWidth/8, window.innerWidth/8,  window.innerHeight/8, -window.innerHeight/8, 1, 1.1 );
+    Game.cameraOrtho.position.z = 1;
     Game.camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 15000);
     //Game.camera.rotation.y = THREE.Math.degToRad(0);
    // Game.camera.lookAt(new THREE.Vector3(0,0,0));
     Game.scene.add(Game.camera);
 
+
+    Game.hud = new HUD( "NbEnemeies ", "Ammo " , "Points ");
+    Game.hud.addToParent( Game.scene );
+
     Game.renderer.shadowMapEnabled = true;
     Game.renderer.shadowMapSoft = true;
+    Game.renderer.autoClear = false;
 
     Game.createWorld();
 
@@ -72,8 +79,8 @@ Game.init = function () {
       window.addEventListener('deviceorientation', setOrientationControls, true);
 
       Game.add_elements();
-      window.addEventListener('resize', Game.resize, false);
-      setTimeout(Game.resize, 1);   
+      window.addEventListener('resize', Game.resize);
+      setTimeout(Game.resize, 1);
 }
 
 Game.createWorld = function()
@@ -200,7 +207,6 @@ Game.createWorld = function()
     }
 
     Game.PlayerSpeed = 30;
-    
     var PathCollisionsSpheres = [];
 
     Game.path = this.calculatePath(PathCollisionsSpheres);
@@ -220,13 +226,19 @@ Game.spawnEnemy = function()
     // only for the test, i chose to create Enemy linked to the camera
     // the vecFront is the vector representing where the object will be.
     // in the future the enemy should be added in scene of course !
-    var vecFront = new THREE.Vector3( 0, 0, 20 );
+    /*var vecFront = new THREE.Vector3( 0, 0, 20 );
     vecFront.applyQuaternion ( Game.camera.quaternion );
     //console.log( Game.camera.quaternion);
     var enemyMesh = new Enemy( vecFront );
     Game.camera.add( enemyMesh );
 
-    return enemyMesh.position; // For Debugging purpose
+    return enemyMesh.position; // For Debugging purpose*/
+    Game.hud = new HUD( "NbEnemeies ", "Ammo " , "Points ");
+    var vecFront = new THREE.Vector3( 0, 0, 10 );
+    vecFront.applyQuaternion ( Game.camera.quaternion );
+    //console.log( Game.camera.quaternion);
+    Game.hud.setPosition( vecFront );
+    Game.hud.addToParent( Game.camera );
 }
 
 function onMouseMove( event )
@@ -309,11 +321,15 @@ Game.addLight = function ( h, s, l, x, y, z ) {
 
 Game.resize = function ()
 {
+    console.log("Resize");
     var width = Game.container.offsetWidth;
     var height = Game.container.offsetHeight;
 
     Game.camera.aspect = width / height;
     Game.camera.updateProjectionMatrix();
+
+    Game.cameraOrtho.aspect = width / height;
+    Game.cameraOrtho.updateProjectionMatrix();
 
     Game.renderer.setSize(width, height);
     if(Game.isdisplayedOn3D) {
@@ -324,16 +340,17 @@ Game.resize = function ()
 
 Game.update = function (dt) 
 {
-    Game.update.lastEnemySpawn = Game.update.lastEnemySpawn || 0;
+    /*Game.update.lastEnemySpawn = Game.update.lastEnemySpawn || 0;
     if(Game.clock.getElapsedTime () - Game.update.lastEnemySpawn > Game.TimeBetweenEnemies)
     {
         //console.log(Game.spawnEnemy());
         //Game.spawnEnemy();
         Game.update.lastEnemySpawn = Game.clock.getElapsedTime ();
     }
-    Game.resize();
-    Game.shoot();
+   
+    //Game.shoot();*/
     Game.camera.updateProjectionMatrix();
+    Game.cameraOrtho.updateProjectionMatrix();
 
     // if distance to the next checkpoint is shorter than distance to travel this tick 
     // then increment checkpoint
@@ -353,14 +370,8 @@ Game.update = function (dt)
         var distanceToNextCheckpoint = Game.camera.position.distanceTo(Game.path[Game.nextCheckpoint]);
     }
 
-
-   // console.log(Game.nextCheckpoint);
-
     Game.camera.lookAt(Game.path[Game.nextCheckpoint]);
-   // console.log(Game.camera.rotation);
-
     Game.camera.translateZ(-translateDistance);
-
 /*    if(Game.isdisplayedOn3D) {
         Game.controls.update(dt);
     }
@@ -374,16 +385,7 @@ Game.update = function (dt)
 }
 
 Game.onWindowResize = function( event ) {
-    var width = Game.container.offsetWidth;
-    var height = Game.container.offsetHeight;
-
-    Game.camera.aspect = width / height;
-    Game.camera.updateProjectionMatrix();
-
-    Game.renderer.setSize(width, height);
-    if(Game.isdisplayedOn3D) {
-        Game.effect.setSize(width, height);
-    }
+     Game.resize();
 }
 
 //
@@ -402,6 +404,7 @@ Game.render = function () {
     else
     {
         Game.renderer.render(Game.scene, Game.camera);
+        Game.renderer.render(Game.scene, Game.cameraOrtho);
     }
 }
 
