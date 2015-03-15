@@ -3,7 +3,7 @@ window.Game = window.Game || {};
 Game.init = function () {
 
     Game.clock = new THREE.Clock();
-    Game.isdisplayedOn3D = false;
+    Game.isdisplayedOn3D = mobilecheck();
     Game.mouse = new THREE.Vector2();
     Game.raycaster = new THREE.Raycaster();
 
