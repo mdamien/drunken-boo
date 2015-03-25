@@ -72,7 +72,7 @@ Game.init = function () {
     if (!e.alpha) {
       return;
     }
-        Game.controls = new THREE.DeviceOrientationControls(Game.camera, Game.container.domElement);
+        Game.controls = new THREE.DeviceOrientationControls(Game.camera, true);
         Game.controls.connect();
         Game.controls.update();
 
@@ -287,6 +287,7 @@ Game.shoot = function () {
     Game.raycaster.setFromCamera( Game.mouse, Game.camera );
     // calculate objects intersecting the picking ray
     var intersects = Game.raycaster.intersectObjects( Game.enemies, true );
+<<<<<<< HEAD
 
     if ( intersects.length > 0 ) {
 
@@ -297,6 +298,18 @@ Game.shoot = function () {
                 Game.enemies.splice( i, 1 );   // remove the id of the ennemy killed from the array;
                 i=Game.enemies.length;
 
+=======
+
+    if ( intersects.length > 0 ) {
+
+        for ( var i=0; i<Game.enemies.length; i++ ) {
+
+            if ( Game.enemies[i].id==intersects[ 0 ].object.parent.parent.id ) {
+
+                Game.enemies.splice( i, 1 );   // remove the id of the ennemy killed from the array;
+                i=Game.enemies.length;
+
+>>>>>>> the 3D seems to work right now
             }
 
         }
@@ -381,6 +394,7 @@ Game.spawnEnemy = function()
     {
         enemyDistance -= distanceBetweenCheckpoints;
         currentPosition.copy(Game.path[nextCheckpoint]);
+<<<<<<< HEAD
 
         if(nextCheckpoint < Game.path.length-1)
             nextCheckpoint++;
@@ -393,6 +407,20 @@ Game.spawnEnemy = function()
     translationVector.multiplyScalar(enemyDistance);
     translationVector.divideScalar(distanceBetweenCheckpoints);
 
+=======
+
+        if(nextCheckpoint < Game.path.length-1)
+            nextCheckpoint++;
+        else
+            nextCheckpoint=0;
+
+        distanceBetweenCheckpoints = currentPosition.distanceTo(Game.path[nextCheckpoint]);
+    }
+    var translationVector = new THREE.Vector3().subVectors(Game.path[nextCheckpoint], currentPosition);
+    translationVector.multiplyScalar(enemyDistance);
+    translationVector.divideScalar(distanceBetweenCheckpoints);
+
+>>>>>>> the 3D seems to work right now
     var enemySpawnPosition = new THREE.Vector3().addVectors(currentPosition, translationVector);
 
     // check that the ennemy can be spawned on this position (ie :  not overlapping another ennemy or a building)
@@ -443,6 +471,7 @@ Game.movePlayer = function(dt)
         var distanceToCollision = Game.DistanceEnemyCollision;
         var nextCollisionFrom = new THREE.Vector3().copy(Game.camera.position); // position as vector3
         var nextCollisionCheckpointTo = Game.nextCheckpoint;    // checkpoint index
+<<<<<<< HEAD
 
         var distanceToNextCollisionsCheckpoint = nextCollisionFrom.distanceTo(Game.path[nextCollisionCheckpointTo]);
 
@@ -463,6 +492,28 @@ Game.movePlayer = function(dt)
             distanceToNextCollisionsCheckpoint = nextCollisionFrom.distanceTo(Game.path[nextCollisionCheckpointTo]);
         }
 
+=======
+
+        var distanceToNextCollisionsCheckpoint = nextCollisionFrom.distanceTo(Game.path[nextCollisionCheckpointTo]);
+
+        while(distanceToNextCollisionsCheckpoint < distanceToCollision)
+        {
+            if(this.crashTest(nextCollisionFrom, Game.path[nextCollisionCheckpointTo]))
+                distanceToCollision=0;
+
+            distanceToCollision-=distanceToNextCollisionsCheckpoint;
+
+            nextCollisionFrom = Game.path[nextCollisionCheckpointTo];
+
+            if(nextCollisionCheckpointTo < Game.path.length-1)
+                nextCollisionCheckpointTo = nextCollisionCheckpointTo+1;
+            else
+                nextCollisionCheckpointTo = 0;
+
+            distanceToNextCollisionsCheckpoint = nextCollisionFrom.distanceTo(Game.path[nextCollisionCheckpointTo]);
+        }
+
+>>>>>>> the 3D seems to work right now
         this.crashTest(nextCollisionFrom, Game.path[nextCollisionCheckpointTo], distanceToCollision);
     }
 
