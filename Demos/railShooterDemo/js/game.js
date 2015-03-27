@@ -72,10 +72,9 @@ Game.init = function () {
     if (!e.alpha) {
       return;
     }
-
-/*        controls = new THREE.DeviceOrientationControls(Game.camera, true);
-        controls.connect();
-        controls.update();*/
+        Game.controls = new THREE.DeviceOrientationControls(Game.camera, Game.container.domElement );
+        Game.controls.connect();
+        Game.controls.update();
 
         Game.element.addEventListener('click', Game.fullscreen, false);
 
@@ -514,9 +513,9 @@ Game.update = function (dt) {
 
     Game.movePlayer(dt);
 
-/*    if(Game.isdisplayedOn3D) {
+    if(Game.isdisplayedOn3D) {
         Game.controls.update(dt);
-    }
+    }/*
     else {
         Game.controls.update(dt);
     }*/
