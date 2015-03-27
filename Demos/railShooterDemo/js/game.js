@@ -37,6 +37,7 @@ Game.init = function () {
     Game.TimeBetweenEnemies = 2;
 
     Game.enemies = []; // array of Enemies
+    THREEx.FullScreen.bindKey({ charCode : 'm'.charCodeAt(0) });
 
     // console.log(Game.camera.position);
 
