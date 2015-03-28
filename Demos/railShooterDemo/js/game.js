@@ -76,7 +76,7 @@ Game.init = function () {
 
         Game.controls = new THREE.DeviceOrientationControls(Game.camera, true);
         Game.controls.connect();
-        Game.controls.update();
+        //Game.controls.update();
 
         Game.element.addEventListener('click', Game.fullscreen, false);
 
