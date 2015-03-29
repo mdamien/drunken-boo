@@ -356,12 +356,9 @@ Game.movePlayer = function(dt)
             // console.log(intersects[ 0 ]);
             if(distanceToCollision === undefined || intersects[ 0 ].distance<distanceToCollision)
             {
-                Game.finish();
-                Game.start();
+                Game.hit();
                 intersects[ 0 ].object.material = Enemy.crashedMaterial;
-
-              //  console.log(Game.camera.position.distanceTo(intersects[ 0 ].object.position));
-
+                console.log(Game.camera.position.distanceTo(intersects[ 0 ].object.position));
                 return true;
             }
         }
@@ -519,6 +516,11 @@ Game.start = function()
    // Game.camera.lookAt(new THREE.Vector3(0,0,0));
     Game.scene.add(Game.camera);
 
+
+    Game.deathAmbiantLight = new THREE.AmbientLight( 0x000000 );
+    Game.life = 1.0;
+    Game.camera.add (Game.deathAmbiantLight);
+
     // Game.renderer.shadowMapEnabled = true;
     // Game.renderer.shadowMapSoft = true;
 
@@ -579,6 +581,17 @@ Game.start = function()
       setTimeout(Game.resize, 1);
 
       Game.animate();
+}
+
+Game.hit = function ()
+{
+    Game.life = Game.life - 0.1;
+    console.log("Game.kig "+Game.life)
+    Game.deathAmbiantLight.color.r = 1.0 - Game.life;
+    if( Game.life <= 0) {
+        Game.finish();
+        Game.start();
+    }
 }
 
 //start the game
