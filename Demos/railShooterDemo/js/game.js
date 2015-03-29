@@ -28,7 +28,18 @@ Game.init = function () {
 
     // Game.renderer.shadowMapEnabled = true;
     // Game.renderer.shadowMapSoft = true;
-
+    if(Game.isdisplayedOn3D)
+       {
+            /*var ballTexture = THREE.ImageUtils.loadTexture( 'textures/cursor.png' );
+            var cursor = new THREE.SpriteMaterial( { map: ballTexture, useScreenCoordinates: true, depthTest: false } );
+            Game.cursor = new THREE.Sprite( cursor );
+            Game.cursor.scale.set( 8, 8, 1.0 );
+            Game.cursor.position.copy( Game.camera.position );
+            Game.cursor.rotation.copy( Game.camera.rotation );
+            Game.cursor.updateMatrix();
+            Game.cursor.translateZ( - 100 );
+            Game.camera.add( Game.cursor );*/
+        }
     Game.createWorld();
 
     Game.PlayerSpeed = 40;
