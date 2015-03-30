@@ -13,7 +13,6 @@ Game.init = function () {
     Game.clock = new THREE.Clock();
     Game.mouse = new THREE.Vector2();
     Game.raycaster = new THREE.Raycaster();
-
     Game.start();
 }
 
@@ -518,7 +517,7 @@ Game.start = function()
 
 
     Game.deathAmbiantLight = new THREE.AmbientLight( 0x000000 );
-    Game.life = 1.0;
+    Game.life = 10;
     Game.camera.add (Game.deathAmbiantLight);
 
     // Game.renderer.shadowMapEnabled = true;
@@ -585,9 +584,9 @@ Game.start = function()
 
 Game.hit = function ()
 {
-    Game.life = Game.life - 0.1;
-    console.log("Game.kig "+Game.life)
-    Game.deathAmbiantLight.color.r = 1.0 - Game.life;
+    Game.life = Game.life - 1;
+    console.log("Game.life "+Game.life)
+    Game.deathAmbiantLight.color.r = 1.0 - Game.life / 10;
     if( Game.life <= 0) {
         Game.finish();
         Game.start();
