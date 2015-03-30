@@ -29,8 +29,8 @@ Game.init = function () {
     // Game.renderer.shadowMapEnabled = true;
     // Game.renderer.shadowMapSoft = true;
     if(Game.isdisplayedOn3D)
-       {
-            /*var ballTexture = THREE.ImageUtils.loadTexture( 'textures/cursor.png' );
+    {
+            var ballTexture = THREE.ImageUtils.loadTexture( 'textures/cursor.png' );
             var cursor = new THREE.SpriteMaterial( { map: ballTexture, useScreenCoordinates: true, depthTest: false } );
             Game.cursor = new THREE.Sprite( cursor );
             Game.cursor.scale.set( 8, 8, 1.0 );
@@ -38,8 +38,8 @@ Game.init = function () {
             Game.cursor.rotation.copy( Game.camera.rotation );
             Game.cursor.updateMatrix();
             Game.cursor.translateZ( - 100 );
-            Game.camera.add( Game.cursor );*/
-        }
+            Game.camera.add( Game.cursor );
+    }
     Game.createWorld();
 
     Game.PlayerSpeed = 40;
@@ -296,7 +296,15 @@ function onMouseMove( event )
 Game.shoot = function () {
 
     //@see SpawnEnemy the raycast should be tested between camera and game.scene
-    Game.raycaster.setFromCamera( Game.mouse, Game.camera );
+    if(Game.isdisplayedOn3D) {
+        Game.raycaster.setFromCamera( Game.mouse, Game.camera );
+    }
+    else
+    {
+        var direction = new  THREE.Vector3(0, 0, 1000);
+
+        Game.raycaster.set( Game.camera.position , direction );
+    }
     // calculate objects intersecting the picking ray
     var intersects = Game.raycaster.intersectObjects( Game.enemies, true );
 
@@ -308,6 +316,7 @@ Game.shoot = function () {
 
                 Game.enemies.splice( i, 1 );   // remove the id of the ennemy killed from the array;
                 i=Game.enemies.length;
+                console.log("kill")
 
             }
 
