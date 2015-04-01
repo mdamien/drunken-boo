@@ -30,15 +30,15 @@ Game.init = function () {
     // Game.renderer.shadowMapSoft = true;
     if(Game.isdisplayedOn3D)
     {
-            var ballTexture = THREE.ImageUtils.loadTexture( 'textures/cursor.png' );
-            var cursor = new THREE.SpriteMaterial( { map: ballTexture, useScreenCoordinates: true, depthTest: false } );
-            Game.cursor = new THREE.Sprite( cursor );
-            Game.cursor.scale.set( 8, 8, 1.0 );
-            Game.cursor.position.copy( Game.camera.position );
-            Game.cursor.rotation.copy( Game.camera.rotation );
-            Game.cursor.updateMatrix();
-            Game.cursor.translateZ( - 100 );
-            Game.camera.add( Game.cursor );
+        var ballTexture = THREE.ImageUtils.loadTexture( 'textures/cursor.png' );
+        var cursor = new THREE.SpriteMaterial( { map: ballTexture, useScreenCoordinates: true, depthTest: false } );
+        Game.cursor = new THREE.Sprite( cursor );
+        Game.cursor.scale.set( 8, 8, 1.0 );
+        Game.cursor.position.copy( Game.camera.position );
+        Game.cursor.rotation.copy( Game.camera.rotation );
+        Game.cursor.updateMatrix();
+        Game.cursor.translateZ( - 100 );
+        Game.camera.add( Game.cursor );
     }
     Game.createWorld();
 
@@ -301,8 +301,7 @@ Game.shoot = function () {
     }
     else
     {
-        var direction = new  THREE.Vector3(0, 0, 1000);
-
+        var direction = Game.camera.getWorldDirection();
         Game.raycaster.set( Game.camera.position , direction );
     }
     // calculate objects intersecting the picking ray
@@ -316,8 +315,6 @@ Game.shoot = function () {
 
                 Game.enemies.splice( i, 1 );   // remove the id of the ennemy killed from the array;
                 i=Game.enemies.length;
-                console.log("kill")
-
             }
 
         }
@@ -527,12 +524,14 @@ Game.update = function (dt) {
         }
 
     }
-
+    //console.log(THREE.Utils.cameraLookDir(Game.camera));
+    //console.log(Game.camera.getWorldDirection());
     Game.resize();
     Game.shoot();
     Game.camera.updateProjectionMatrix();
 
     Game.movePlayer(dt);
+
 
 /*    if(Game.isdisplayedOn3D) {
         Game.controls.update(dt);
