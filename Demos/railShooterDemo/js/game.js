@@ -17,6 +17,86 @@ Game.init = function () {
     Game.start();
 }
 
+Game.start = function()
+{
+    window.removeEventListener('resize', Game.resize, false);
+    Game.scene = new THREE.Scene();
+    Game.camera;
+    if(Game.isdisplayedOn3D)
+        Game.camera = new THREE.PerspectiveCamera(90, 1, 0.001, 700);
+    else
+        Game.camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 15000);
+    //Game.camera.rotation.y = THREE.Math.degToRad(0);
+   // Game.camera.lookAt(new THREE.Vector3(0,0,0));
+    var gunRelativePosition = new THREE.Vector3(-7, -2, -10);
+    var gun = new Weapon(gunRelativePosition);
+    Game.camera.add(gun);
+    Game.scene.add(Game.camera);
+
+
+    Game.deathAmbiantLight = new THREE.AmbientLight( 0x000000 );
+    Game.life = 10;
+    Game.camera.add (Game.deathAmbiantLight);
+
+    // Game.renderer.shadowMapEnabled = true;
+    // Game.renderer.shadowMapSoft = true;
+
+    Game.createWorld();
+
+    Game.PlayerSpeed = 40;
+    Game.DistanceEnemyCollision = 10;
+
+    Game.TimeBetweenEnemies = 2;
+
+    Game.enemies = []; // array of Enemies
+
+    Game.controls;
+    if(Game.isdisplayedOn3D){
+        Game.controls = new THREE.OrbitControls(Game.camera, Game.element);
+        Game.controls.rotateUp(Math.PI / 4);
+        Game.controls.target.set(
+            Game.camera.position.x + 0.1,
+            Game.camera.position.y,
+            Game.camera.position.z
+        );
+        Game.controls.noZoom = true;
+        Game.controls.noPan = true;
+    }
+    else
+    {
+        Game.controls = new THREE.FlyControls( Game.camera );
+        Game.controls.movementSpeed = 2500;
+        Game.controls.domElement = Game.container;
+        Game.controls.rollSpeed = Math.PI / 6;
+        Game.controls.autoForward = false;
+        Game.controls.dragToLook = false
+    }
+
+
+    //should be above in the else
+    window.addEventListener('mousemove', onMouseMove, false);
+    function setOrientationControls(e) {
+    if (!e.alpha) {
+      return;
+    }
+
+/*        controls = new THREE.DeviceOrientationControls(Game.camera, true);
+        controls.connect();
+        controls.update();*/
+
+        Game.element.addEventListener('click', Game.fullscreen, false);
+
+        window.removeEventListener('deviceorientation', setOrientationControls, true);
+      }
+      window.addEventListener('deviceorientation', setOrientationControls, true);
+
+      Game.add_elements();
+      window.addEventListener('resize', Game.resize, false);
+      setTimeout(Game.resize, 1);
+
+      Game.animate();
+}
+
 Game.createWorld = function() {
 
     var boxWidth = 20;
@@ -503,89 +583,6 @@ Game.finish = function()
     }
 }
 
-Game.start = function()
-{
-    window.removeEventListener('resize', Game.resize, false);
-    Game.scene = new THREE.Scene();
-    Game.camera;
-    if(Game.isdisplayedOn3D)
-        Game.camera = new THREE.PerspectiveCamera(90, 1, 0.001, 700);
-    else
-        Game.camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 15000);
-    //Game.camera.rotation.y = THREE.Math.degToRad(0);
-   // Game.camera.lookAt(new THREE.Vector3(0,0,0));
-    var gunRelativePosition = new THREE.Vector3(-7, -2, -10);
-    var gun = new Weapon(gunRelativePosition);
-    Game.camera.add(gun);
-    Game.scene.add(Game.camera);
-
-
-    Game.deathAmbiantLight = new THREE.AmbientLight( 0x000000 );
-    Game.life = 10;
-    Game.camera.add (Game.deathAmbiantLight);
-
-    // Game.renderer.shadowMapEnabled = true;
-    // Game.renderer.shadowMapSoft = true;
-
-    Game.createWorld();
-
-    Game.PlayerSpeed = 40;
-    Game.DistanceEnemyCollision = 10;
-
-    Game.TimeBetweenEnemies = 2;
-
-    Game.enemies = []; // array of Enemies
-
-    // for(var i=0; i<Game.path.length; i++)
-    //     console.log(Game.path[i]);
-
-/*    Game.controls;
-    if(Game.isdisplayedOn3D){
-        Game.controls = new THREE.OrbitControls(Game.camera, Game.element);
-        Game.controls.rotateUp(Math.PI / 4);
-        Game.controls.target.set(
-            Game.camera.position.x + 0.1,
-            Game.camera.position.y,
-            Game.camera.position.z
-        );
-        Game.controls.noZoom = true;
-        Game.controls.noPan = true;
-    }
-    else
-    {
-        Game.controls = new THREE.FlyControls( Game.camera );
-        Game.controls.movementSpeed = 2500;
-        Game.controls.domElement = Game.container;
-        Game.controls.rollSpeed = Math.PI / 6;
-        Game.controls.autoForward = false;
-        Game.controls.dragToLook = false
-    }
-
-*/
-    //should be above in the else
-    window.addEventListener('mousemove', onMouseMove, false);
-    function setOrientationControls(e) {
-    if (!e.alpha) {
-      return;
-    }
-
-/*        controls = new THREE.DeviceOrientationControls(Game.camera, true);
-        controls.connect();
-        controls.update();*/
-
-        Game.element.addEventListener('click', Game.fullscreen, false);
-
-        window.removeEventListener('deviceorientation', setOrientationControls, true);
-      }
-      window.addEventListener('deviceorientation', setOrientationControls, true);
-
-      Game.add_elements();
-      window.addEventListener('resize', Game.resize, false);
-      setTimeout(Game.resize, 1);
-
-      Game.animate();
-}
-
 Game.hit = function ()
 {
     Game.life = Game.life - 1;
@@ -599,10 +596,4 @@ Game.hit = function ()
 
 //start the game
 Game.init();
-// var textGeometry = new THREE.TextGeometry("RailShooter \n by \n ...");
-// var textMaterial = new THREE.MeshPhongMaterial( { ambient: '#'+Math.floor(Math.random()*16777215).toString(16)
-// , color: 0xffffff, specular: 0xffffff, shininess: 50 } );
 
-// var textMesh = new THREE.Mesh(textGeometry, textMaterial);
-
-// Game.scene.add(textMesh);
