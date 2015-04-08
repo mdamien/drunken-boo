@@ -24,6 +24,10 @@ Game.init = function () {
         Game.camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 15000);
     //Game.camera.rotation.y = THREE.Math.degToRad(0);
    // Game.camera.lookAt(new THREE.Vector3(0,0,0));
+
+    var gunRelativePosition = new THREE.Vector3(-7, -2, -10);
+    var gun = new Weapon(gunRelativePosition);
+    Game.camera.add(gun);
     Game.scene.add(Game.camera);
 
     // Game.renderer.shadowMapEnabled = true;
@@ -419,9 +423,11 @@ Game.spawnEnemy = function()
 
     if(spawned)
     {
-        var enemyMesh = new Enemy( enemySpawnPosition );
+        /*var enemyMesh = new Enemy( enemySpawnPosition );
         Game.scene.add( enemyMesh );
         Game.enemies.push(enemyMesh);
+        */
+
     }
     return spawned;
 }
