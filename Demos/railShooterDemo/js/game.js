@@ -33,7 +33,6 @@ Game.start = function()
     Game.camera.add(gun);
     Game.scene.add(Game.camera);
 
-
     Game.deathAmbiantLight = new THREE.AmbientLight( 0x000000 );
     Game.life = 10;
     Game.camera.add (Game.deathAmbiantLight);
@@ -45,11 +44,11 @@ Game.start = function()
 
     Game.PlayerSpeed = 40;
     Game.DistanceEnemyCollision = 10;
-
-    Game.TimeBetweenEnemies = 2;
+    Game.TimeBetweenEnemies = 4;
 
     Game.enemies = []; // array of Enemies
-
+    Game.bullets = []; // array of Ray in order to update bullet position
+createBullet(Game.gun);
     Game.controls;
     if(Game.isdisplayedOn3D){
         Game.controls = new THREE.OrbitControls(Game.camera, Game.element);
@@ -417,9 +416,11 @@ Game.spawnEnemy = function()
 
     if(spawned)
     {
-        var enemyMesh = new Enemy( enemySpawnPosition );
-        Game.scene.add( enemyMesh );
-        Game.enemies.push(enemyMesh);
+        //var enemyMesh = new Enemy( enemySpawnPosition );
+        //Game.scene.add( enemyMesh );
+        //Game.enemies.push(enemyMesh);
+
+        //createBullet( Game.camera );
     }
     return spawned;
 }
@@ -517,6 +518,7 @@ Game.update = function (dt) {
 
     Game.resize();
     Game.shoot();
+    Game.updateBullets();
     Game.camera.updateProjectionMatrix();
 
     Game.movePlayer(dt);
@@ -528,6 +530,16 @@ Game.update = function (dt) {
         Game.controls.update(dt);
     }*/
 
+}
+
+Game.updateBullets = function() {
+    var speed = 1;
+    for(var i = 0; i < Game.bullets.length; i++) {
+        b = Game.bullets[ i ];
+        d = b.ray.direction;
+        b.translateX(speed * d.x);
+        b.translateZ(speed * d.z);
+    }
 }
 
 Game.onWindowResize = function( event ) {
