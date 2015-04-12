@@ -417,9 +417,9 @@ Game.spawnEnemy = function()
 
     if(spawned)
     {
-        //var enemyMesh = new Enemy( enemySpawnPosition );
-        //Game.scene.add( enemyMesh );
-        //Game.enemies.push(enemyMesh);
+        var enemyMesh = new Enemy( enemySpawnPosition );
+        Game.scene.add( enemyMesh );
+        Game.enemies.push(enemyMesh);
 
         createBullet( Game.gun );
     }
@@ -518,12 +518,10 @@ Game.update = function (dt) {
     }
 
     Game.resize();
-    Game.shoot();
-    updateBulletsPosition();
+    //Game.shoot();
     Game.camera.updateProjectionMatrix();
-
-    //Game.movePlayer(dt);
-
+    Game.movePlayer(dt);
+    updateBulletsPosition();
 /*    if(Game.isdisplayedOn3D) {
         Game.controls.update(dt);
     }
@@ -565,17 +563,6 @@ Game.render = function () {
     }
 }
 
-Game.fullscreen = function () {
- if (Game.container.requestFullscreen) {
-    Game.container.requestFullscreen();
-  } else if (Game.container.msRequestFullscreen) {
-    Game.container.msRequestFullscreen();
-  } else if (Game.container.mozRequestFullScreen) {
-    Game.container.mozRequestFullScreen();
-  } else if (Game.container.webkitRequestFullscreen) {
-    Game.container.webkitRequestFullscreen();
-  }
-}
 
 Game.finish = function()
 {
