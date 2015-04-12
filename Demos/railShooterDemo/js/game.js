@@ -14,6 +14,7 @@ Game.init = function () {
     Game.clock = new THREE.Clock();
     Game.mouse = new THREE.Vector2();
     Game.raycaster = new THREE.Raycaster();
+    Game.WidthTerrain = 1300;
     Game.start();
 }
 
@@ -48,7 +49,7 @@ Game.start = function()
 
     Game.enemies = []; // array of Enemies
     Game.bullets = []; // array of Ray in order to update bullet position
-createBullet(Game.gun);
+    
     Game.controls;
     if(Game.isdisplayedOn3D){
         Game.controls = new THREE.OrbitControls(Game.camera, Game.element);
@@ -99,7 +100,7 @@ createBullet(Game.gun);
 Game.createWorld = function() {
 
     var boxWidth = 20;
-    var terrainWidth = 1300;
+    var terrainWidth = Game.WidthTerrain;
     var boxMinHeight = 10, boxMaxHeight = 80;
     var density = 5; // %
 
@@ -420,7 +421,7 @@ Game.spawnEnemy = function()
         //Game.scene.add( enemyMesh );
         //Game.enemies.push(enemyMesh);
 
-        //createBullet( Game.camera );
+        createBullet( Game.gun );
     }
     return spawned;
 }
@@ -518,10 +519,10 @@ Game.update = function (dt) {
 
     Game.resize();
     Game.shoot();
-    Game.updateBullets();
+    updateBulletsPosition();
     Game.camera.updateProjectionMatrix();
 
-    Game.movePlayer(dt);
+    //Game.movePlayer(dt);
 
 /*    if(Game.isdisplayedOn3D) {
         Game.controls.update(dt);
@@ -530,16 +531,6 @@ Game.update = function (dt) {
         Game.controls.update(dt);
     }*/
 
-}
-
-Game.updateBullets = function() {
-    var speed = 1;
-    for(var i = 0; i < Game.bullets.length; i++) {
-        b = Game.bullets[ i ];
-        d = b.ray.direction;
-        b.translateX(speed * d.x);
-        b.translateZ(speed * d.z);
-    }
 }
 
 Game.onWindowResize = function( event ) {
