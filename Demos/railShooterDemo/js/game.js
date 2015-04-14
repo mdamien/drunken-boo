@@ -306,14 +306,15 @@ Game.shoot = function () {
             if ( Game.enemies[i].id==intersects[ 0 ].object.parent.parent.id ) {
 
                 //Game.scene.remove(Game.enemies[i]);
-                Game.enemies.splice( i, 1 );   // remove the id of the ennemy killed from the array;
+                Game.removeEnemy( i );
+                //Game.enemies.splice( i, 1 );   // remove the id of the ennemy killed from the array;
                 continue;
 
             }
 
         }
 
-        Game.scene.remove( intersects[ 0 ].object.parent.parent );
+        //Game.scene.remove( intersects[ 0 ].object.parent.parent );
 
     }
 
