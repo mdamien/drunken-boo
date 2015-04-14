@@ -58,8 +58,8 @@ function isoutOfBorder(bullet, indexTab) {
     }
 }
 
-function updateBulletsPosition() {
-    var speed = 10;
+function updateBulletsPosition(delta) {
+    var speed = 200 * delta;
     for(var i = 0; i < Game.bullets.length; i++) {
         b = Game.bullets[ i ];
         d = b.ray.direction;

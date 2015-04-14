@@ -534,7 +534,7 @@ Game.update = function (dt) {
     //Game.shoot();
     Game.camera.updateProjectionMatrix();
     Game.movePlayer(dt);
-    updateBulletsPosition();
+    updateBulletsPosition(dt);
 /*    if(Game.isdisplayedOn3D) {
         Game.controls.update(dt);
     }
