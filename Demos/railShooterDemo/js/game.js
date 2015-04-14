@@ -45,7 +45,8 @@ Game.start = function()
 
     Game.PlayerSpeed = 40;
     Game.DistanceEnemyCollision = 10;
-    Game.TimeBetweenEnemies = 4;
+    Game.TimeBetweenEnemies = 2;
+    Game.TimeBetweenBullets = 0.6;
 
     Game.enemies = []; // array of Enemies
     Game.bullets = []; // array of Ray in order to update bullet position
@@ -304,8 +305,9 @@ Game.shoot = function () {
 
             if ( Game.enemies[i].id==intersects[ 0 ].object.parent.parent.id ) {
 
+                //Game.scene.remove(Game.enemies[i]);
                 Game.enemies.splice( i, 1 );   // remove the id of the ennemy killed from the array;
-                i=Game.enemies.length;
+                continue;
 
             }
 
@@ -315,6 +317,11 @@ Game.shoot = function () {
 
     }
 
+}
+
+Game.removeEnemy = function ( index ) {
+    Game.scene.remove( Game.enemies[ index ] );
+    Game.enemies.splice( index, 1 );   // remove the id of the ennemy killed from the array;
 }
 
 Game.add_elements = function ()
@@ -420,8 +427,6 @@ Game.spawnEnemy = function()
         var enemyMesh = new Enemy( enemySpawnPosition );
         Game.scene.add( enemyMesh );
         Game.enemies.push(enemyMesh);
-
-        createBullet( Game.gun );
     }
     return spawned;
 }
@@ -506,6 +511,7 @@ Game.movePlayer = function(dt)
 Game.update = function (dt) {
 
     Game.update.lastEnemySpawn = Game.update.lastEnemySpawn || 0;
+    Game.update.lastBulletSpawn = Game.update.lastBulletSpawn || 0;
 
     if ( Game.clock.getElapsedTime() - Game.update.lastEnemySpawn > Game.TimeBetweenEnemies ) {
 
@@ -515,6 +521,12 @@ Game.update = function (dt) {
 
         }
 
+    }
+
+    if( Game.clock.getElapsedTime() - Game.update.lastBulletSpawn >  Game.TimeBetweenBullets )
+    {
+        createBullet(Game.gun);
+        Game.update.lastBulletSpawn = Game.clock.getElapsedTime ();
     }
 
     Game.resize();
