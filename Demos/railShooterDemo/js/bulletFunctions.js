@@ -38,10 +38,10 @@ function createBullet(obj) {
 }
 
 function isCollide(bullet, indexTab) {
-
-    for ( var i = 0 ; i < Game.enemies.length ; i++ ) {
-        if ( Game.enemies[i].position.distanceTo( bullet.position ) < Game.enemies[i].collisionRadius ) {
+    for ( var i = 0 ; i < Game.enemies.length; i++ ) {
+        if ( Game.enemies[i].position.distanceTo( bullet.position ) < Enemy.collisionRadius ) {
             console.log("colision");
+            Game.removeEnemy( i );
             Game.bullets.splice(indexTab, 1);
             Game.scene.remove(bullet);
         }
@@ -69,8 +69,9 @@ function updateBulletsPosition() {
             b.translateY(speed * d.y);
         }
         b.translateZ(speed * d.z);
-
-        isCollide( Game.bullets[ i ], i);
-        isoutOfBorder( Game.bullets[ i ], i);
+        if( Game.bullets.length > 0 && Game.enemies.length > 0) {
+            isCollide( Game.bullets[ i ], i);
+            isoutOfBorder( Game.bullets[ i ], i);
+        }
     }
 }
