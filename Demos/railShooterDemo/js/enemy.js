@@ -25,7 +25,7 @@ loader.load(
 
 		Enemy.creatureObject3D = object;
 
-	} , 
+	},
 	// Function called when downloads progress 
 	function ( xhr ) { 
 		console.log( (xhr.loaded / xhr.total * 100) + '% loaded' ); 
@@ -38,7 +38,7 @@ loader.load(
 Enemy.crashedMaterial = new THREE.MeshPhongMaterial( { color: 0xff0000 } );
 Enemy.type = "Enemy";
 Enemy.name = "Enemy";
-Enemy.collisionRadius = 2;
+Enemy.collisionRadius = 10;
 
 Enemy.prototype = Object.create( THREE.Object3D.prototype );
 Enemy.prototype.constructor = Enemy;
