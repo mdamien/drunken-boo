@@ -10,16 +10,98 @@ Game.init = function () {
 
     //instanciate a new stereoEffect even if it's not used afterward
     Game.effect = new THREE.StereoEffect(Game.renderer);
+
     Game.clock = new THREE.Clock();
     Game.mouse = new THREE.Vector2();
     Game.raycaster = new THREE.Raycaster();
+    Game.WidthTerrain = 1300;
     Game.start();
+}
+
+Game.start = function()
+{
+    window.removeEventListener('resize', Game.resize, false);
+    Game.scene = new THREE.Scene();
+    Game.camera;
+    if(Game.isdisplayedOn3D)
+        Game.camera = new THREE.PerspectiveCamera(90, 1, 0.001, 700);
+    else
+        Game.camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 15000);
+    //Game.camera.rotation.y = THREE.Math.degToRad(0);
+   // Game.camera.lookAt(new THREE.Vector3(0,0,0));
+    var gunRelativePosition = new THREE.Vector3(-7, -2, -10);
+    var gun = new Weapon(gunRelativePosition);
+    Game.camera.add(gun);
+    Game.scene.add(Game.camera);
+
+    Game.deathAmbiantLight = new THREE.AmbientLight( 0x000000 );
+    Game.life = 10;
+    Game.camera.add (Game.deathAmbiantLight);
+
+    // Game.renderer.shadowMapEnabled = true;
+    // Game.renderer.shadowMapSoft = true;
+
+    Game.createWorld();
+
+    Game.PlayerSpeed = 40;
+    Game.DistanceEnemyCollision = 10;
+    Game.TimeBetweenEnemies = 2;
+    Game.TimeBetweenBullets = 0.6;
+
+    Game.enemies = []; // array of Enemies
+    Game.bullets = []; // array of Ray in order to update bullet position
+    
+    Game.controls;
+    if(Game.isdisplayedOn3D){
+        Game.controls = new THREE.OrbitControls(Game.camera, Game.element);
+        Game.controls.rotateUp(Math.PI / 4);
+        Game.controls.target.set(
+            Game.camera.position.x + 0.1,
+            Game.camera.position.y,
+            Game.camera.position.z
+        );
+        Game.controls.noZoom = true;
+        Game.controls.noPan = true;
+    }
+    else
+    {
+        Game.controls = new THREE.FlyControls( Game.camera );
+        Game.controls.movementSpeed = 2500;
+        Game.controls.domElement = Game.container;
+        Game.controls.rollSpeed = Math.PI / 6;
+        Game.controls.autoForward = false;
+        Game.controls.dragToLook = false
+    }
+
+
+    //should be above in the else
+    window.addEventListener('mousemove', onMouseMove, false);
+    function setOrientationControls(e) {
+    if (!e.alpha) {
+      return;
+    }
+
+/*        controls = new THREE.DeviceOrientationControls(Game.camera, true);
+        controls.connect();
+        controls.update();*/
+
+        Game.element.addEventListener('click', Game.fullscreen, false);
+
+        window.removeEventListener('deviceorientation', setOrientationControls, true);
+      }
+      window.addEventListener('deviceorientation', setOrientationControls, true);
+
+      Game.add_elements();
+      window.addEventListener('resize', Game.resize, false);
+      setTimeout(Game.resize, 1);
+
+      Game.animate();
 }
 
 Game.createWorld = function() {
 
     var boxWidth = 20;
-    var terrainWidth = 1300;
+    var terrainWidth = Game.WidthTerrain;
     var boxMinHeight = 10, boxMaxHeight = 80;
     var density = 5; // %
 
@@ -223,17 +305,24 @@ Game.shoot = function () {
 
             if ( Game.enemies[i].id==intersects[ 0 ].object.parent.parent.id ) {
 
-                Game.enemies.splice( i, 1 );   // remove the id of the ennemy killed from the array;
-                i=Game.enemies.length;
+                //Game.scene.remove(Game.enemies[i]);
+                Game.removeEnemy( i );
+                //Game.enemies.splice( i, 1 );   // remove the id of the ennemy killed from the array;
+                continue;
 
             }
 
         }
 
-        Game.scene.remove( intersects[ 0 ].object.parent.parent );
+        //Game.scene.remove( intersects[ 0 ].object.parent.parent );
 
     }
 
+}
+
+Game.removeEnemy = function ( index ) {
+    Game.scene.remove( Game.enemies[ index ] );
+    Game.enemies.splice( index, 1 );   // remove the id of the ennemy killed from the array;
 }
 
 Game.add_elements = function ()
@@ -423,6 +512,7 @@ Game.movePlayer = function(dt)
 Game.update = function (dt) {
 
     Game.update.lastEnemySpawn = Game.update.lastEnemySpawn || 0;
+    Game.update.lastBulletSpawn = Game.update.lastBulletSpawn || 0;
 
     if ( Game.clock.getElapsedTime() - Game.update.lastEnemySpawn > Game.TimeBetweenEnemies ) {
 
@@ -434,12 +524,17 @@ Game.update = function (dt) {
 
     }
 
+    if( Game.clock.getElapsedTime() - Game.update.lastBulletSpawn >  Game.TimeBetweenBullets )
+    {
+        createBullet(Game.gun);
+        Game.update.lastBulletSpawn = Game.clock.getElapsedTime ();
+    }
+
     Game.resize();
-    Game.shoot();
+    //Game.shoot();
     Game.camera.updateProjectionMatrix();
-
     Game.movePlayer(dt);
-
+    updateBulletsPosition(dt);
 /*    if(Game.isdisplayedOn3D) {
         Game.controls.update(dt);
     }
@@ -481,17 +576,6 @@ Game.render = function () {
     }
 }
 
-Game.fullscreen = function () {
- if (Game.container.requestFullscreen) {
-    Game.container.requestFullscreen();
-  } else if (Game.container.msRequestFullscreen) {
-    Game.container.msRequestFullscreen();
-  } else if (Game.container.mozRequestFullScreen) {
-    Game.container.mozRequestFullScreen();
-  } else if (Game.container.webkitRequestFullscreen) {
-    Game.container.webkitRequestFullscreen();
-  }
-}
 
 Game.finish = function()
 {
@@ -500,86 +584,6 @@ Game.finish = function()
     {
          document.location.href="http://threejs.org/" 
     }
-}
-
-Game.start = function()
-{
-    window.removeEventListener('resize', Game.resize, false);
-    Game.scene = new THREE.Scene();
-    Game.camera;
-    if(Game.isdisplayedOn3D)
-        Game.camera = new THREE.PerspectiveCamera(90, 1, 0.001, 700);
-    else
-        Game.camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 15000);
-    //Game.camera.rotation.y = THREE.Math.degToRad(0);
-   // Game.camera.lookAt(new THREE.Vector3(0,0,0));
-    Game.scene.add(Game.camera);
-
-
-    Game.deathAmbiantLight = new THREE.AmbientLight( 0x000000 );
-    Game.life = 10;
-    Game.camera.add (Game.deathAmbiantLight);
-
-    // Game.renderer.shadowMapEnabled = true;
-    // Game.renderer.shadowMapSoft = true;
-
-    Game.createWorld();
-
-    Game.PlayerSpeed = 40;
-    Game.DistanceEnemyCollision = 10;
-
-    Game.TimeBetweenEnemies = 2;
-
-    Game.enemies = []; // array of Enemies
-
-    // for(var i=0; i<Game.path.length; i++)
-    //     console.log(Game.path[i]);
-
-/*    Game.controls;
-    if(Game.isdisplayedOn3D){
-        Game.controls = new THREE.OrbitControls(Game.camera, Game.element);
-        Game.controls.rotateUp(Math.PI / 4);
-        Game.controls.target.set(
-            Game.camera.position.x + 0.1,
-            Game.camera.position.y,
-            Game.camera.position.z
-        );
-        Game.controls.noZoom = true;
-        Game.controls.noPan = true;
-    }
-    else
-    {
-        Game.controls = new THREE.FlyControls( Game.camera );
-        Game.controls.movementSpeed = 2500;
-        Game.controls.domElement = Game.container;
-        Game.controls.rollSpeed = Math.PI / 6;
-        Game.controls.autoForward = false;
-        Game.controls.dragToLook = false
-    }
-
-*/
-    //should be above in the else
-    window.addEventListener('mousemove', onMouseMove, false);
-    function setOrientationControls(e) {
-    if (!e.alpha) {
-      return;
-    }
-
-/*        controls = new THREE.DeviceOrientationControls(Game.camera, true);
-        controls.connect();
-        controls.update();*/
-
-        Game.element.addEventListener('click', Game.fullscreen, false);
-
-        window.removeEventListener('deviceorientation', setOrientationControls, true);
-      }
-      window.addEventListener('deviceorientation', setOrientationControls, true);
-
-      Game.add_elements();
-      window.addEventListener('resize', Game.resize, false);
-      setTimeout(Game.resize, 1);
-
-      Game.animate();
 }
 
 Game.hit = function ()
@@ -595,10 +599,4 @@ Game.hit = function ()
 
 //start the game
 Game.init();
-// var textGeometry = new THREE.TextGeometry("RailShooter \n by \n ...");
-// var textMaterial = new THREE.MeshPhongMaterial( { ambient: '#'+Math.floor(Math.random()*16777215).toString(16)
-// , color: 0xffffff, specular: 0xffffff, shininess: 50 } );
 
-// var textMesh = new THREE.Mesh(textGeometry, textMaterial);
-
-// Game.scene.add(textMesh);
