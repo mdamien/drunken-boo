@@ -213,7 +213,14 @@ function onMouseMove( event )
 Game.shoot = function () {
 
     //@see SpawnEnemy the raycast should be tested between camera and game.scene
-    Game.raycaster.setFromCamera( Game.mouse, Game.camera );
+    if(!Game.isdisplayedOn3D) {
+        Game.raycaster.setFromCamera( Game.mouse, Game.camera );
+    }
+    else
+    {
+        var direction = Game.camera.getWorldDirection();
+        Game.raycaster.set( Game.camera.position , direction );
+    }
     // calculate objects intersecting the picking ray
     var intersects = Game.raycaster.intersectObjects( Game.enemies, true );
 
@@ -225,7 +232,6 @@ Game.shoot = function () {
 
                 Game.enemies.splice( i, 1 );   // remove the id of the ennemy killed from the array;
                 i=Game.enemies.length;
-
             }
 
         }
@@ -433,12 +439,14 @@ Game.update = function (dt) {
         }
 
     }
-
+    //console.log(THREE.Utils.cameraLookDir(Game.camera));
+    //console.log(Game.camera.getWorldDirection());
     Game.resize();
     Game.shoot();
     Game.camera.updateProjectionMatrix();
 
     Game.movePlayer(dt);
+
 
 /*    if(Game.isdisplayedOn3D) {
         Game.controls.update(dt);
